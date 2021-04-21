@@ -11,13 +11,15 @@ from flask import render_template, request
 import os
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
-from .forms import CarForm
+from .forms import CarForm, RegistrationForm
 from flask import send_from_directory
 from flask import jsonify
 
 from flask_login import login_user, logout_user, current_user, login_required
 from app.models import Users
 from werkzeug.security import check_password_hash
+
+from datetime import date
 
 ###
 # Routing for your application.
@@ -43,6 +45,34 @@ def upload():
             
         error = form_errors(myform)
         return jsonify(error= error)
+
+
+@app.route("api/register", methods=["POST"])
+def register():
+    myform = RegistrationForm()
+    if request.method == 'POST' and myform.validate_on_submit():
+            # Get file data and save to your uploads folder
+            username = myform.Username.data
+            password = myform.Password.data
+            name = myform.Name.data
+            email = myform.Email.data
+            loc = myform.Location.data
+            bio = myform.Biography.data
+            photo = myform.photo.data
+            date_joined = date.today()
+
+            filefolder = app.config['UPLOAD_FOLDER']
+            filename = secure_filename(photo.filename)
+
+            #rootdir = os.getcwd()
+            photo.save(os.path.join(filefolder,filename))
+
+            info = {'message': 'User Successful Added', 'Name': name, 'Date': date_joined }
+            return  jsonify(info=info)
+
+    error = form_errors(myform)
+    return jsonify(error= error)
+
 
 @app.route('/api/cars', methods=['POST', 'GET'])
 def cars():
@@ -107,6 +137,7 @@ def cars():
     error = form_errors(myform)
     return jsonify(error= error)
 
+
 @app.route("/api/car/<car_id>", methods=["GET"])
 def car(car_id):
     #myform =
@@ -127,6 +158,7 @@ def car(car_id):
     #error = form_errors(myform)
     #return jsonify(error= error)
 
+
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])
 def carFav(car_id):
     #myform = 
@@ -145,6 +177,7 @@ def carFav(car_id):
 
     #error = form_errors(myform)
     #return jsonify(error= error)
+
 
 @app.route("/api/search", methods=["GET"])
 def search():
@@ -178,6 +211,7 @@ def search():
     ]
     return  jsonify(cars=results)
 
+
 @app.route("/api/users/<user_id>", methods=["GET"])
 def users(user_id):
     user = {
@@ -191,6 +225,7 @@ def users(user_id):
         "date_joined": "2021-04-05 17:53:00"
     }
     return  jsonify(user=user)
+
 
 @app.route("/api/car/<user_id>/favourites", methods=["GET"])
 def userFav(user_id):
@@ -224,15 +259,8 @@ def userFav(user_id):
     ]
     return  jsonify(cars=results)
 
-@app.route("/logout")
-@login_required
-def logout():
-    # Logout the user and end the session
-    logout_user()
-    flash('You have been logged out.', 'danger')
-    return redirect(url_for('index'))
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("api/auth/login", methods=["POST"])
 def login():
     form = LoginForm()
     if request.method == "POST":
@@ -262,6 +290,14 @@ def login():
                 return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
     return render_template("login.html", form=form)
 
+
+@app.route("api/auth/logout")
+@login_required
+def logout():
+    # Logout the user and end the session
+    logout_user()
+    flash('You have been logged out.', 'danger')
+    return redirect(url_for('index'))
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
@@ -305,7 +341,6 @@ def form_errors(form):
 ###
 # The functions below should be applicable to all Flask apps.
 ###
-
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
