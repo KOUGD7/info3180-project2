@@ -69,38 +69,212 @@ app.component('app-footer', {
 });
 
 //--------------------------------------------------------------
+const Home = {
+    name: 'Home',
+    template: `
+    <div class="row home-page" style="width:100%;">
+      <div class="column home-des" style="float:left; width:50%; height:100%;">
+        <div class="row">
+          <h1><strong>Buy and Sell Cars Online</strong></h1>
+        </div>
+
+        <div class="row">
+          <p>United Auto Sales provides the fastest, easiest and most user
+             friendly way to buy or sell cars online. Find a Great Price on
+             the Vehicle You Want
+             </p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <button to="/register" type="submit" class="register typebtn" style="border:2px solid #20B2AA; background-color:#20B2AA; border-radius:25px; color:#FFFFFF;">Register</button>
+            </div>
+
+            <div class="col-md-2">
+                <button to="/login" type="submit" class="login typebtn" style="border: 2px solid #FFD700; background-color:#FFD700; border-radius:25px; color:#FFFFFF">Login</button>
+            </div>
+        </div>
+
+      </div>
+
+      <div class="column home-img" style="float:left; width:50%; height:100%;">
+        <img src="/static/home-img.jpg" alt="home-img" style="object-fit:fill;" >
+      </div>
+    </div>
+    `,
+    data() {
+        return {}
+    }
+};
+//--------------------------------------------------------------
 const RegistrationForm = {
     name: 'registration-form',
     template: `
     <h2>Register New User</h2>
-    <div>
- 
+    <div v-if="message[0] == 'good'">
+        <div class="alert alert-success" role="alert">
+            <ul v-for="m in message[1]" > 
+                <li>{{ m }}</li>
+            </ul>
+        </div>
     </div>
+    <div v-if="message[0] == 'bad'">
+        <div class="alert alert-warning" role="alert">
+            <ul v-for="m in message[1]"> 
+                <p>{{ m }}</p>
+            </ul>
+        </div>
+    </div>
+    
+    <form @submit.prevent="uploadProfilePhoto" id="uploadprofile" method="post">
+  
+        <div class= "form-group">
+          <label>Username</label>
+          <input type="text" class ="form-control" name="Username">
+        </div>
+  
+        <div class= "form-group">
+          <label>Password</label>
+          <input type="password" class ="form-control" name="Password">
+        </div>
+  
+        <div class= "form-group">
+          <label>Fullname</label>
+          <input type="text" class ="form-control" name="Fullname">
+        </div>
+  
+        <div class= "form-group">
+          <label>Email</label>
+          <input type="text" class ="form-control" name="Email">
+        </div>
+
+        <div class= "form-group">
+          <label>Location</label>
+          <input type="text" class ="form-control" name="Location">
+        </div>
+  
+        <div class="form-group">
+          <label class="font-weight-bold">Biography</label>
+          <textarea class="form-control" rows="5" id="des" name="Biography"></textarea>
+        </div>
+    
+        <div class = "form-group">
+          <label>Upload Photo</label>
+          <input class ="form-control" type="file" name="photo">
+        </div>
+        <button type="submit" name="submit" class="btn btn-primary">Register</button>
+    </form>
     `,
     data() {
         return {
             message: []
         }
     },
-    methods: { }
+    methods: {
+        uploadProfilePhoto(){
+            let self = this;
+            let uploadprofile = document.getElementById('uploadprofile');
+            let form_data = new FormData(uploadprofile);
+  
+            fetch("/api/register", {
+                method: 'POST',
+                body: form_data,
+                headers: {
+                    'X-CSRFToken': token
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(function (response) {
+                return response.json();
+                })
+                .then(function (jsonResponse) {
+                // display a success message
+                console.log(jsonResponse);
+                if(jsonResponse.error){
+                    self.message = ['bad', jsonResponse.error]
+                }
+                else{
+                    self.message = ['good',[jsonResponse.car.message]]
+                }
+                
+                })
+                .catch(function (error) {
+                console.log(error);
+                });
+        }
+    }
 };
 //--------------------------------------------------------------
 
 const Login = {
     name: 'login',
     template: `
-    <h2>Login</h2>
-    <div>
- 
+    <h2>Login to your account</h2>
+    <div v-if="message[0] == 'good'">
+        <div class="alert alert-success" role="alert">
+            <ul v-for="m in message[1]" > 
+                <li>{{ m }}</li>
+            </ul>
+        </div>
     </div>
+    <div v-if="message[0] == 'bad'">
+        <div class="alert alert-warning" role="alert">
+            <ul v-for="m in message[1]"> 
+                <p>{{ m }}</p>
+            </ul>
+        </div>
+    </div>
+    
+    <form @submit.prevent="login" id="login" method="post">
+  
+        <div class= "form-group">
+          <label>Username</label>
+          <input type="text" class ="form-control" name="Username">
+        </div>
+  
+        <div class= "form-group">
+          <label>Password</label>
+          <input type="password" class ="form-control" name="Password">
+        </div>
+    
+        <button type="submit" name="submit" class="btn btn-primary">Login</button>
+    </form>
     `,
     data() {
         return {
             message: []
         }
     },
-    methods: {}
-};
+    methods: {
+     /*   Login(){
+
+            fetch("/api/login", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': token
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(function (response) {
+                return response.json();
+                })
+                .then(function (jsonResponse) {
+                // display a success message
+                console.log(jsonResponse);
+                if(jsonResponse.error){
+                    self.message = ['bad', jsonResponse.error]
+                }
+                else{
+                    self.message = ['good',[jsonResponse.car.message]]
+                }
+                
+                })
+                .catch(function (error) {
+                console.log(error);
+                });
+        }*/
+    }
+  };
 //--------------------------------------------------------------
 
 const Logout = {
@@ -348,9 +522,39 @@ const CarForm = {
 const CarDetails = {
     name: 'car-details',
     template: `
-    <h2>Car Details</h2>
-    <div>
- 
+    <div class="card" style="width: 18rem;" id="card-details">
+      <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
+      
+      <div class="card-body">
+        <h5 class=card-title>2018 Tesla</h5>
+        <h4 class=card-title>Model S</h4>
+        <p card-text>Some random text until we connect the backend. Same thing for the titles.</p>
+      
+        <div class="row">
+          <div class="col-md-4">
+            <p class="card-text">Colour: (Red)</p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="card-text">Body Type: (Sedan)</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <p class="card-text">Price: ($100000)</p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="card-text">Transmission: (Automatic)</p>
+          </div>
+        </div>
+
+        <div class="row" id="prop-btn">
+            <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+            <i class="bi bi-heart"></i>
+        </div>
+      </div>
     </div>
     `,
     data() {
@@ -361,43 +565,6 @@ const CarDetails = {
     methods: {}
 };
 //----------------------------------------------------------------
-const Home = {
-    name: 'Home',
-    template: `
-    <div class="row home-page" style="width:100%;">
-      <div class="column home-des" style="float:left; width:50%; height:100%;">
-        <b-row>
-          <h1><strong>Buy and Sell Cars Online</strong></h1>
-        </b-row>
-
-        <b-row>
-          <p>United Auto Sales provides the fastest, easiest and most user
-             friendly way to buy or sell cars online. Find a Great Price on
-             the Vehicle You Want
-             </p>
-        </b-row>
-
-        <div class="row">
-            <div class="col-md-2">
-                <button to="/register" type="submit" class="register typebtn" style="border:2px solid #20B2AA; background-color:#20B2AA; border-radius:25px; color:#FFFFFF;">Register</button>
-            </div>
-
-            <div class="col-md-2">
-                <button to="/login" type="submit" class="login typebtn" style="border: 2px solid #FFD700; background-color:#FFD700; border-radius:25px; color:#FFFFFF">Login</button>
-            </div>
-        </div>
-
-      </div>
-
-      <div class="column home-img" style="float:left; width:50%; height:100%;">
-        <img src="/static/home-img.jpg" alt="home-img" style="object-fit:fill;" >
-      </div>
-    </div>
-    `,
-    data() {
-        return {}
-    }
-};
 
 const NotFound = {
     name: 'NotFound',
