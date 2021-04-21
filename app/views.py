@@ -40,7 +40,7 @@ def upload():
         error = form_errors(myform)
         return jsonify(error= error)
 
-@app.route('/api/cars', methods=['POST'])
+@app.route('/api/cars', methods=['POST', 'GET'])
 def cars():
     myform = CarForm()
     if request.method == 'POST': 
@@ -65,9 +65,161 @@ def cars():
             car = {'message': 'Car Successful Added', 'Make': Make, 'Model': Model, 'Colour': Colour, 'Year': Year, 'Price': Price, 'Type': Type, 'Transmission': Tran, 'Description': Descrip }
             info = {'message': 'File Upload Successful', 'filename': filename, 'description': Descrip}
             return  jsonify(car=car)
-            
+
         error = form_errors(myform)
         return jsonify(error= error)
+
+    if request.method == 'GET':
+        cars = [
+            {
+                "id": 123,
+                "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
+                "year": "2014",
+                "make": "Subaru",
+                "model": "Forrester",
+                "colour": "Gray",
+                "transmission": "Automatic",
+                "car_type": "SUV",
+                "price": 17998.99,
+                "photo": "http://localhost/images/subaru.jpg",
+                "user_id": 1
+            },
+            {
+                "id": 207,
+                "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
+                "year": "2018",
+                "make": "Tesla",
+                "model": "Model S Plaid",
+                "colour": "Red",
+                "transmission": "Automatic",
+                "car_type": "Sedan",
+                "price": 32998.99,
+                "photo": "http://localhost/images/tesla.jpg",
+                "user_id": 2
+            }
+        ]
+
+        return  jsonify(cars=cars)
+    error = form_errors(myform)
+    return jsonify(error= error)
+
+@app.route("/api/car/<car_id>", methods=["GET"])
+def car(car_id):
+    #myform =
+    car = {
+        "id": 123,
+        "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
+        "year": "2014",
+        "make": "Subaru",
+        "model": "Forrester",
+        "colour": "Gray",
+        "transmission": "Automatic",
+        "car_type": "SUV",
+        "price": 17998.99,
+        "photo": "http://localhost/images/subaru.jpg",
+        "user_id": 1
+    }
+    return  jsonify(car=car)
+    #error = form_errors(myform)
+    #return jsonify(error= error)
+
+@app.route("/api/car/<car_id>/favourite", methods=["POST"])
+def carFav(car_id):
+    #myform = 
+    if request.method == 'POST' and myform.validate_on_submit(): 
+        info = {
+                "message": "Car Successfully Favourited",
+                "car_id": 1
+        }
+        return  jsonify(info=info)
+    else:
+        info = {
+                "message": "Car Failed to be Favourited",
+                "car_id": 1
+        }
+        return  jsonify(info=info)
+
+    #error = form_errors(myform)
+    #return jsonify(error= error)
+
+@app.route("/api/search", methods=["GET"])
+def search():
+    results = [
+        {
+            "id": 123,
+            "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
+            "year": "2014",
+            "make": "Subaru",
+            "model": "Forrester",
+            "colour": "Gray",
+            "transmission": "Automatic",
+            "car_type": "SUV",
+            "price": 17998.99,
+            "photo": "http://localhost/images/subaru.jpg",
+            "user_id": 1
+        },
+        {
+            "id": 207,
+            "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
+            "year": "2018",
+            "make": "Tesla",
+            "model": "Model S Plaid",
+            "colour": "Red",
+            "transmission": "Automatic",
+            "car_type": "Sedan",
+            "price": 32998.99,
+            "photo": "http://localhost/images/tesla.jpg",
+            "user_id": 2
+        }
+    ]
+    return  jsonify(cars=results)
+
+@app.route("/api/users/<user_id>", methods=["GET"])
+def users(user_id):
+    user = {
+        "id": 1,
+        "username": "car_expert",
+        "name": "Danica Patrick",
+        "photo": "http://localhost/images/photo.jpg",
+        "email": "dpatrick@example.com",
+        "location": "Wisconsin, USA",
+        "biography": "I am a former professional racing driver and the most successful woman in the history of American open-wheel racing. I love cars and driving fast.",
+        "date_joined": "2021-04-05 17:53:00"
+    }
+    return  jsonify(user=user)
+
+@app.route("/api/car/<user_id>/favourites", methods=["GET"])
+def userFav(user_id):
+    results = [
+        {
+            "id": 123,
+            "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
+            "year": "2014",
+            "make": "Subaru",
+            "model": "Forrester",
+            "colour": "Gray",
+            "transmission": "Automatic",
+            "car_type": "SUV",
+            "price": 17998.99,
+            "photo": "http://localhost/images/subaru.jpg",
+            "user_id": 1
+        },
+        {
+            "id": 207,
+            "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
+            "year": "2018",
+            "make": "Tesla",
+            "model": "Model S Plaid",
+            "colour": "Red",
+            "transmission": "Automatic",
+            "car_type": "Sedan",
+            "price": 32998.99,
+            "photo": "http://localhost/images/tesla.jpg",
+            "user_id": 2
+        }
+    ]
+    return  jsonify(cars=results)
+
 
 # Please create all new routes and view functions above this route.
 # This route is now our catch all route for our VueJS single page
