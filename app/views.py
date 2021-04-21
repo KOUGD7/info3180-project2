@@ -5,7 +5,7 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 
-from app import app
+from app import app, db, login_manager
 from flask import render_template, request
 
 import os
@@ -14,6 +14,10 @@ from .forms import UploadForm
 from .forms import CarForm
 from flask import send_from_directory
 from flask import jsonify
+
+from flask_login import login_user, logout_user, current_user, login_required
+from app.models import Users
+from werkzeug.security import check_password_hash
 
 ###
 # Routing for your application.
@@ -219,6 +223,51 @@ def userFav(user_id):
         }
     ]
     return  jsonify(cars=results)
+
+@app.route("/logout")
+@login_required
+def logout():
+    # Logout the user and end the session
+    logout_user()
+    flash('You have been logged out.', 'danger')
+    return redirect(url_for('index'))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if request.method == "POST":
+        # change this to actually validate the entire form submission
+        # and not just one field
+        #if form.username.data:
+        if form.validate_on_submit():
+            usern = form.username.data
+            passw = form.password.data
+
+            user = Users.query.filter_by(username= usern)
+
+            # Get the username and password values from the form.
+            user = UserProfile.query.filter_by(username= usern).first()
+            # using your model, query database for a user based on the username
+            # and password submitted. Remember you need to compare the password hash.
+            # You will need to import the appropriate function to do so.
+            # Then store the result of that query to a `user` variable so it can be
+            # passed to the login_user() method below.
+            
+            if user and check_password_hash(user.password, passw):
+                # get user id, load into session
+                login_user(user)
+
+                # remember to flash a message to the user
+                flash('Logged in successfully.', 'success')
+                return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
+    return render_template("login.html", form=form)
+
+
+# user_loader callback. This callback is used to reload the user object from
+# the user ID stored in the session
+@login_manager.user_loader
+def load_user(id):
+    return Users.query.get(int(id))
 
 
 # Please create all new routes and view functions above this route.
