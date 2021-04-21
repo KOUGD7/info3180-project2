@@ -565,6 +565,18 @@ const CarDetails = {
     methods: {}
 };
 //----------------------------------------------------------------
+/*const Home = {
+    name: 'Home',
+    template: `
+    <div class="jumbotron">
+        <h1>United Auto Sales</h1>
+        <p class="lead">In this lab we will demonstrate VueJS working with Forms and Form Validation from Flask-WTF.</p>
+    </div>
+    `,
+    data() {
+        return {}
+    }
+};*/
 
 const NotFound = {
     name: 'NotFound',
