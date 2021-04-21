@@ -47,28 +47,28 @@ def upload():
         return jsonify(error= error)
 
 
-@app.route("api/register", methods=["POST"])
+@app.route("/api/register", methods=["POST"])
 def register():
     myform = RegistrationForm()
     if request.method == 'POST' and myform.validate_on_submit():
-            # Get file data and save to your uploads folder
-            username = myform.Username.data
-            password = myform.Password.data
-            name = myform.Name.data
-            email = myform.Email.data
-            loc = myform.Location.data
-            bio = myform.Biography.data
-            photo = myform.photo.data
-            date_joined = date.today()
+        # Get file data and save to your uploads folder
+        username = myform.Username.data
+        password = myform.Password.data
+        name = myform.Name.data
+        email = myform.Email.data
+        loc = myform.Location.data
+        bio = myform.Biography.data
+        photo = myform.photo.data
+        date_joined = date.today()
 
-            filefolder = app.config['UPLOAD_FOLDER']
-            filename = secure_filename(photo.filename)
+        filefolder = app.config['UPLOAD_FOLDER']
+        filename = secure_filename(photo.filename)
 
-            #rootdir = os.getcwd()
-            photo.save(os.path.join(filefolder,filename))
+        #rootdir = os.getcwd()
+        photo.save(os.path.join(filefolder,filename))
 
-            info = {'message': 'User Successful Added', 'Name': name, 'Date': date_joined }
-            return  jsonify(info=info)
+        info = {'message': 'User Successful Added', 'Name': name, 'Date': date_joined }
+        return  jsonify(info=info)
 
     error = form_errors(myform)
     return jsonify(error= error)
@@ -260,7 +260,7 @@ def userFav(user_id):
     return  jsonify(cars=results)
 
 
-@app.route("api/auth/login", methods=["POST"])
+@app.route("/api/auth/login", methods=["POST"])
 def login():
     form = LoginForm()
     if request.method == "POST":
@@ -291,7 +291,7 @@ def login():
     return render_template("login.html", form=form)
 
 
-@app.route("api/auth/logout")
+@app.route("/api/auth/logout")
 @login_required
 def logout():
     # Logout the user and end the session
