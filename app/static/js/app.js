@@ -35,7 +35,7 @@ app.component('app-header', {
             <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/users/{user_id}">MyProfile <span class="sr-only">(current)</span></router-link>
+            <a class="nav-link" @click="myProfile">MyProfile <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" to="/upload">Upload <span class="sr-only">(current)</span></router-link>
@@ -49,7 +49,20 @@ app.component('app-header', {
         </ul>
       </div>
     </nav>
-    `
+    `,
+    data() {
+      return {
+          user: [],
+      }
+  },
+  methods: {
+    myProfile(){
+      let uid = 1
+      router.push(`/users/${uid}`);
+
+    }
+    
+  }
 });
 
 app.component('app-footer', {
@@ -401,30 +414,6 @@ const Explore = {
       goToCarDetails(cid){
         this.$router.push(`/cars/${cid}`);
 
-        /* fetch(`api/cars/${cid}`, {
-          method: 'GET',
-          headers: {
-              'X-CSRFToken': token
-              },
-              credentials: 'same-origin'
-          })
-          .then(function (response) {
-          return response.json();
-          })
-          .then(function (jsonResponse) {
-          // display a success message
-          console.log(jsonResponse);
-          if(jsonResponse.error){
-              self.message = ['bad', jsonResponse.error]
-          }
-          else{
-              self.message = jsonResponse
-          }
-          
-          })
-          .catch(function (error) {
-          console.log(error);
-          }); */
       }
     }
 };
@@ -499,8 +488,8 @@ const CarDetails = {
 };
 
 //--------------------------------------------------------------
-const MyProfile = {
-  name: 'MyProfile',
+const User = {
+  name: 'user',
   template:`
     <div class="card" id="myprofile">
 
@@ -509,15 +498,15 @@ const MyProfile = {
       </div>  
 
       <div class="card-body">
-        <h5 class=card-title>2018 Danicka Patrick</h5>
-        <h3 class=card-title>@dpatrick</h3>
+        <h5 class=card-title>{{user.name}}</h5>
+        <h3 class=card-title>@{{user.username}}</h3>
         <br>
-        <p class="card-text">Some random text until we connect the backend. Same thing for the titles.</p>
+        <p class="card-text">{{user.biography}}</p>
         <br>
         <br>
-        <p class="card-text text-left">Email: dpatrick@example.com</p>
-        <p class="card-text text-left">Location: Wisconsin, USA</p>
-        <p class="card-text text-left">Joined: April 8,2021</p> 
+        <p class="card-text text-left">Email: {{user.email}}</p>
+        <p class="card-text text-left">Location: {{user.location}}</p>
+        <p class="card-text text-left">Joined: {{user.date_joined}}</p> 
       </div>
     </div>  
 
@@ -553,11 +542,10 @@ const MyProfile = {
   `,
     created()
     {
-    /*  let self = this;
+      let self = this;
 
-      fetch("/api/users/{user_id}", {
+      fetch(`/api/users/${self.$route.params.user_id}`, {
           method: 'GET',
-          body: form_data,
           headers: {
               'X-CSRFToken': token
               },
@@ -568,12 +556,13 @@ const MyProfile = {
              })
              .then(function(data){
                 console.log(data);
-                self.users = data.users;
-             }); */
+                self.user = data.user;
+             });
     },
     data(){
       return{
-        /*  users: [],
+        user: [],
+        /*  
           searchTerm: '' */
       }
     },
@@ -719,8 +708,6 @@ const CarForm = {
   };
 
 //----------------------------------------------------------------
-//--------------------------------------------------------------
-
 const UploadForm = {
   name: 'upload-form',
   template: `
@@ -826,7 +813,7 @@ const routes = [
     { path: '/login', component: Login },
     //{ path: '/logout', component: Logout },
     { path: '/explore', component: Explore },
-    { path: '/users/{user_id}', component: MyProfile },
+    { path: '/users/:user_id', component: User },
     { path: '/upload', component: UploadForm },
     { path: '/cars/new', component: CarForm },
     { path: '/cars/:car_id', component: CarDetails },
