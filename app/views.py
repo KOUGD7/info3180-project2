@@ -122,7 +122,7 @@ def cars():
     if request.method == 'GET':
         cars = [
             {
-                "id": 123,
+                "id": 1,
                 "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
                 "year": "2014",
                 "make": "Subaru",
@@ -135,7 +135,7 @@ def cars():
                 "user_id": 1
             },
             {
-                "id": 207,
+                "id": 2,
                 "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
                 "year": "2018",
                 "make": "Tesla",
@@ -154,25 +154,26 @@ def cars():
     return jsonify(error= error)
 
 
-@app.route("/api/car/<car_id>", methods=["GET"])
+@app.route("/api/cars/<car_id>", methods=["GET"])
 def car(car_id):
     #myform =
-    car = {
-        "id": 123,
-        "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
-        "year": "2014",
-        "make": "Subaru",
-        "model": "Forrester",
-        "colour": "Gray",
-        "transmission": "Automatic",
-        "car_type": "SUV",
-        "price": 17998.99,
-        "photo": "http://localhost/images/subaru.jpg",
-        "user_id": 1
-    }
-    return  jsonify(car=car)
-    #error = form_errors(myform)
-    #return jsonify(error= error)
+    if request.method == 'GET':
+        car = {
+            "id": 1,
+            "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
+            "year": "2014",
+            "make": "Subaru",
+            "model": "Forrester",
+            "colour": "Gray",
+            "transmission": "Automatic",
+            "car_type": "SUV",
+            "price": 17998.99,
+            "photo": "http://localhost/images/subaru.jpg",
+            "user_id": 1
+        }
+        return  jsonify(car=car)
+    error = form_errors(myform)
+    return jsonify(error= error)
 
 
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])

@@ -330,13 +330,14 @@ const Explore = {
                   </div>
 
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
-                    <button class="btn btn-primary mb-2" @click="goToCarDetails">ViewDetails</button>
+                    <button class="btn btn-primary mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
                   </div>
                 </div>
             </div>
       </ul>
     </div>    
-    `,created() {
+    `,
+    created() {
       let self = this;
       fetch('/api/cars',{
         method: 'GET',
@@ -357,7 +358,8 @@ const Explore = {
     },
     data() {
         return {
-            cars: []
+            cars: [],
+            message:[]
         }
     },
     methods: {
@@ -365,13 +367,105 @@ const Explore = {
           
       },
 
-      goToCarDetails(){
-        this.$router.push('/cars/{card_id}');
+      goToCarDetails(cid){
+        this.$router.push(`/cars/${cid}`);
+
+        /* fetch(`api/cars/${cid}`, {
+          method: 'GET',
+          headers: {
+              'X-CSRFToken': token
+              },
+              credentials: 'same-origin'
+          })
+          .then(function (response) {
+          return response.json();
+          })
+          .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+          if(jsonResponse.error){
+              self.message = ['bad', jsonResponse.error]
+          }
+          else{
+              self.message = jsonResponse
+          }
+          
+          })
+          .catch(function (error) {
+          console.log(error);
+          }); */
       }
     }
 };
 //--------------------------------------------------------------
+const CarDetails = {
+  name: 'car-details',
+  template: `
+  <div class="card" id="card-details">
+    <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
+    
+    <div class="card-body">
+      <h5 class=card-title>{{car.year}} {{car.make}}</h5>
+      <h4 class=card-title>{{car.model}}</h4>
+      <p card-text>{{car.description}}</p>
+    
+      <div class="row">
+        <div class="col-md-4">
+          <p class="card-text">Colour: {{car.colour}}</p>
+        </div>
 
+        <div class="col-md-4">
+          <p class="card-text">Body Type: {{car.car_type}}</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <p class="card-text">Price: {{car.price}}</p>
+        </div>
+
+        <div class="col-md-4">
+          <p class="card-text">Transmission: {{car.transmission}}</p>
+        </div>
+      </div>
+
+      <div class="row" id="prop-btn">
+          <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+          <i class="bi bi-heart"></i>
+      </div>
+    </div>
+  </div>
+  `,
+  data() {
+      return {
+          car: [],
+          message: []
+      }
+  },
+  methods: {
+
+  },
+  created() {
+    let self = this;
+    fetch(`/api/cars/${self.$route.params.car_id}`,{
+      method: 'GET',
+      headers: {
+      // 'Authorization': 'Bearer <>'
+      'X-CSRFToken': token
+    },
+    credentials: 'same-origin'
+  })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      console.log(data);
+      self.car = data.car;
+
+    });
+  },
+};
+//--------------------------------------------------------------
 const MyProfile = {
   name: 'MyProfile',
   template:`
@@ -470,78 +564,6 @@ const MyProfile = {
                 self.cars = data.cars;
               });
       } */
-    }
-};
-//--------------------------------------------------------------
-
-const UploadForm = {
-    name: 'upload-form',
-    template: `
-    <h2>Upload Form</h2>
-    <div v-if="message[0] == 'good'">
-        <div class="alert alert-success" role="alert">
-            <ul v-for="m in message[1]" > 
-                <li>{{ m }}</li>
-            </ul>
-        </div>
-    </div>
-    <div v-if="message[0] == 'bad'">
-        <div class="alert alert-warning" role="alert">
-            <ul v-for="m in message[1]"> 
-                <p>{{ m }}</p>
-            </ul>
-        </div>
-    </div>
-    
-    <form @submit.prevent="uploadPhoto" id="uploadForm" method="post">
-        <div class= "form-group">
-            <label>Description</label>
-            <textarea class ="form-control" name="description" placeholder="Description"></textarea>
-        </div>
-        <div class = "form-group">
-            <label>Photo Upload</label>
-            <input class ="form-control" type="file" name="photo">
-        </div>
-        <button type="submit" name="submit" class="btn btn-primary">Upload</button>
-    </form>
-    `,
-    data() {
-        return {
-            message: []
-        }
-    },
-    methods: {
-        uploadPhoto(){
-            let self = this;
-            let uploadForm = document.getElementById('uploadForm');
-            let form_data = new FormData(uploadForm);
-
-            fetch("/api/upload", {
-                method: 'POST',
-                body: form_data,
-                headers: {
-                    'X-CSRFToken': token
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(function (response) {
-                return response.json();
-                })
-                .then(function (jsonResponse) {
-                // display a success message
-                console.log(jsonResponse);
-                if(jsonResponse.error){
-                    self.message = ['bad', jsonResponse.error]
-                }
-                else{
-                    self.message = ['good',[jsonResponse.info.message]]
-                }
-                
-                })
-                .catch(function (error) {
-                console.log(error);
-                });
-        }
     }
 };
 
@@ -664,52 +686,79 @@ const CarForm = {
   };
 
 //----------------------------------------------------------------
+//--------------------------------------------------------------
 
-const CarDetails = {
-    name: 'car-details',
-    template: `
-    <div class="card" style="width: 18rem;" id="card-details">
-      <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
-      
-      <div class="card-body">
-        <h5 class=card-title>2018 Tesla</h5>
-        <h4 class=card-title>Model S</h4>
-        <p card-text>Some random text until we connect the backend. Same thing for the titles.</p>
-      
-        <div class="row">
-          <div class="col-md-4">
-            <p class="card-text">Colour: (Red)</p>
-          </div>
-
-          <div class="col-md-4">
-            <p class="card-text">Body Type: (Sedan)</p>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-4">
-            <p class="card-text">Price: ($100000)</p>
-          </div>
-
-          <div class="col-md-4">
-            <p class="card-text">Transmission: (Automatic)</p>
-          </div>
-        </div>
-
-        <div class="row" id="prop-btn">
-            <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
-            <i class="bi bi-heart"></i>
-        </div>
+const UploadForm = {
+  name: 'upload-form',
+  template: `
+  <h2>Upload Form</h2>
+  <div v-if="message[0] == 'good'">
+      <div class="alert alert-success" role="alert">
+          <ul v-for="m in message[1]" > 
+              <li>{{ m }}</li>
+          </ul>
       </div>
-    </div>
-    `,
-    data() {
-        return {
-            message: []
-        }
-    },
-    methods: {}
+  </div>
+  <div v-if="message[0] == 'bad'">
+      <div class="alert alert-warning" role="alert">
+          <ul v-for="m in message[1]"> 
+              <p>{{ m }}</p>
+          </ul>
+      </div>
+  </div>
+  
+  <form @submit.prevent="uploadPhoto" id="uploadForm" method="post">
+      <div class= "form-group">
+          <label>Description</label>
+          <textarea class ="form-control" name="description" placeholder="Description"></textarea>
+      </div>
+      <div class = "form-group">
+          <label>Photo Upload</label>
+          <input class ="form-control" type="file" name="photo">
+      </div>
+      <button type="submit" name="submit" class="btn btn-primary">Upload</button>
+  </form>
+  `,
+  data() {
+      return {
+          message: []
+      }
+  },
+  methods: {
+      uploadPhoto(){
+          let self = this;
+          let uploadForm = document.getElementById('uploadForm');
+          let form_data = new FormData(uploadForm);
+
+          fetch("/api/upload", {
+              method: 'POST',
+              body: form_data,
+              headers: {
+                  'X-CSRFToken': token
+                  },
+                  credentials: 'same-origin'
+              })
+              .then(function (response) {
+              return response.json();
+              })
+              .then(function (jsonResponse) {
+              // display a success message
+              console.log(jsonResponse);
+              if(jsonResponse.error){
+                  self.message = ['bad', jsonResponse.error]
+              }
+              else{
+                  self.message = ['good',[jsonResponse.info.message]]
+              }
+              
+              })
+              .catch(function (error) {
+              console.log(error);
+              });
+      }
+  }
 };
+
 //----------------------------------------------------------------
 /*const Home = {
     name: 'Home',
@@ -747,7 +796,7 @@ const routes = [
     { path: '/users/{user_id}', component: MyProfile },
     { path: '/upload', component: UploadForm },
     { path: '/cars/new', component: CarForm },
-    { path: '/cars/{card_id}', component: CarDetails },
+    { path: '/cars/:car_id', component: CarDetails },
     // This is a catch all route in case none of the above matches
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound }
 ];
