@@ -317,16 +317,16 @@ const Explore = {
                 <div class="card-body">
 
                   <div class="card1">
-                    <img v-bind:src =car.urlToImage alt="car photo" class="card-img-top rounded-0"/>
+                    <img v-bind:src =car.photo alt="car photo" class="card-img-top rounded-0"/>
                   </div>
 
                   <div class="card-title">
-                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>Random car Make</h6>
-                    <button class="btn btn-primary mb-2">$100,000</button>
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.make}}</h6>
+                    <button class="btn btn-primary mb-2">{{car.price}}</button>
                   </div>
 
                   <div class="card-title">
-                    <p>Random car Model</p>
+                    <p>{{car.model}}</p>
                   </div>
 
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
@@ -336,10 +336,28 @@ const Explore = {
             </div>
       </ul>
     </div>    
-    `,
+    `,created() {
+      let self = this;
+      fetch('/api/cars',{
+        method: 'GET',
+        headers: {
+        // 'Authorization': 'Bearer <>'
+        'X-CSRFToken': token
+      },
+      credentials: 'same-origin'
+    })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        console.log(data);
+        self.cars = data.cars;
+
+      });
+    },
     data() {
         return {
-            message: []
+            cars: []
         }
     },
     methods: {

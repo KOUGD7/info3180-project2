@@ -116,7 +116,7 @@ def cars():
             info = {'message': 'File Upload Successful', 'filename': filename, 'description': Descrip}
             return  jsonify(car=car)
 
-        error = form_errors(myform)
+            error = form_errors(myform)
         return jsonify(error= error)
 
     if request.method == 'GET':
