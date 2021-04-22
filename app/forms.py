@@ -54,3 +54,7 @@ class CarForm (FlaskForm):
         FileRequired(),
         FileAllowed(['jpg', 'png', 'Images only!'])
     ])
+
+class SearchForm(FlaskForm):
+    model = StringField('model')
+    make = StringField('make') 

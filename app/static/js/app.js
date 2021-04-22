@@ -294,6 +294,7 @@ const Explore = {
     name: 'explore',
     template: `
     <h2>Explore</h2>
+    <form @submit.prevent="searchCar" id="searchForm" method="post">
     <div class="form-inline d-flex justify-content-center">
       <div class="form-group mx-sm-3 mb-2">
         <label for="search">Make</label>
@@ -302,9 +303,10 @@ const Explore = {
         <label for="search">Model</label>
         <input type="search" name="model" v-model="searchTerm" id="model" class="form-control mb-2 mr-sm-2"/>
         
-        <button class="btn btn-primary mb-2" @click="searchCar">Search</button>
+        <button class="btn btn-primary mb-2">Search</button>
       </div>
     </div>
+    </form>
 
     <br>
     <br>
@@ -364,7 +366,36 @@ const Explore = {
     },
     methods: {
        searchCar(){
-          
+        let self = this;
+        let sForm = document.getElementById('searchForm');
+        let form_data = new FormData(sForm);
+        //console.log(form_data);
+
+        fetch("/api/search", {
+            method: 'GET',
+            data: form_data,
+            headers: {
+                'X-CSRFToken': token
+                },
+                credentials: 'same-origin'
+            })
+            .then(function (response) {
+            return response.json();
+            })
+            .then(function (jsonResponse) {
+            // display a success message
+            console.log(jsonResponse);
+            if(jsonResponse.error){
+                self.message = ['bad', jsonResponse.error]
+            }
+            else{
+              self.cars = jsonResponse.cars;
+            }
+            
+            })
+            .catch(function (error) {
+            console.log(error);
+            });
       },
 
       goToCarDetails(cid){
@@ -397,6 +428,7 @@ const Explore = {
       }
     }
 };
+
 //--------------------------------------------------------------
 const CarDetails = {
   name: 'car-details',
@@ -465,6 +497,7 @@ const CarDetails = {
     });
   },
 };
+
 //--------------------------------------------------------------
 const MyProfile = {
   name: 'MyProfile',

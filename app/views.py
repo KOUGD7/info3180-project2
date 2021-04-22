@@ -11,7 +11,7 @@ from flask import render_template, request
 import os
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
-from .forms import CarForm, RegistrationForm, LoginForm
+from .forms import CarForm, RegistrationForm, LoginForm, SearchForm
 from flask import send_from_directory
 from flask import jsonify
 
@@ -198,35 +198,40 @@ def carFav(car_id):
 
 @app.route("/api/search", methods=["GET"])
 def search():
-    results = [
-        {
+    myform = SearchForm()
+    if request.method == 'GET':
+        #print(myform.model.data)
+        results = [
+            {
             "id": 123,
             "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
             "year": "2014",
-            "make": "Subaru",
-            "model": "Forrester",
+            "make": "Toyota",
+            "model": "Corolla",
             "colour": "Gray",
             "transmission": "Automatic",
             "car_type": "SUV",
             "price": 17998.99,
             "photo": "http://localhost/images/subaru.jpg",
             "user_id": 1
-        },
-        {
+            },
+            {
             "id": 207,
             "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
             "year": "2018",
-            "make": "Tesla",
-            "model": "Model S Plaid",
+            "make": "Ford",
+            "model": "F1 50",
             "colour": "Red",
             "transmission": "Automatic",
-            "car_type": "Sedan",
+            "car_type": "Truck",
             "price": 32998.99,
             "photo": "http://localhost/images/tesla.jpg",
             "user_id": 2
-        }
-    ]
-    return  jsonify(cars=results)
+            }
+        ]
+        return  jsonify(cars=results)
+    error = form_errors(myform)
+    return jsonify(error= error)
 
 
 @app.route("/api/users/<user_id>", methods=["GET"])
