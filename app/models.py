@@ -10,8 +10,6 @@ class Users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(80))
-    last_name = db.Column(db.String(80))
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(255))
     name = db.Column(db.String(255))
@@ -27,7 +25,7 @@ class Users(db.Model):
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
         
-    def __init__(self, first_name, last_name, username, password, name, email, loca, bio, url, date):
+    def __init__(self, username, password, name, email, loca, bio, url, date):
         self.first_name = first_name
         self.last_name = last_name
         self.username = username

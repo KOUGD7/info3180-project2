@@ -11,15 +11,16 @@ from flask import render_template, request
 import os
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
-from .forms import CarForm, RegistrationForm
+from .forms import CarForm, RegistrationForm, LoginForm
 from flask import send_from_directory
 from flask import jsonify
 
 from flask_login import login_user, logout_user, current_user, login_required
-from app.models import Users
+from app.models import Users, Cars, Favourites
 from werkzeug.security import check_password_hash
 
 from datetime import date
+import jwt
 
 ###
 # Routing for your application.
@@ -64,10 +65,25 @@ def register():
         filefolder = app.config['UPLOAD_FOLDER']
         filename = secure_filename(photo.filename)
 
+        #username, password, name, email, loca, bio, url, date
+        user = Users (username, password, name, email, loc, bio, photo, date_joined)
+        #print(user)
+        db.session.add(user)
+        db.session.commit()
+
         #rootdir = os.getcwd()
         photo.save(os.path.join(filefolder,filename))
 
-        info = {'message': 'User Successful Added', 'Name': name, 'Date': date_joined }
+        info = {
+            "id": user.id,
+            "username": user.username,
+            "name": user.name,
+            "photo": user.photo,
+            "email": user.email,
+            "location": user.location,
+            "biography": user.biography,
+            "date_joined": user.date_joined
+            }
         return  jsonify(info=info)
 
     error = form_errors(myform)
@@ -274,7 +290,7 @@ def login():
             user = Users.query.filter_by(username= usern)
 
             # Get the username and password values from the form.
-            user = UserProfile.query.filter_by(username= usern).first()
+            user = Users.query.filter_by(username= usern).first()
             # using your model, query database for a user based on the username
             # and password submitted. Remember you need to compare the password hash.
             # You will need to import the appropriate function to do so.
@@ -284,11 +300,23 @@ def login():
             if user and check_password_hash(user.password, passw):
                 # get user id, load into session
                 login_user(user)
+                
+                secret = app.config['SECRET_KEY']
+                payload = {'id': user.id, 'name': user.name}
+                encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
+
+                info = {
+                    "message": "Login Successful",
+                    "token": encoded_jwt
+                 }
 
                 # remember to flash a message to the user
-                flash('Logged in successfully.', 'success')
-                return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
-    return render_template("login.html", form=form)
+                #flash('Logged in successfully.', 'success')
+                #return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
+                return  jsonify(info=info)
+    #return render_template("login.html", form=form)
+    error = form_errors(form)
+    return jsonify(error= error)
 
 
 @app.route("/api/auth/logout")
