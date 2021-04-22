@@ -126,7 +126,7 @@ def car(car_id):
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])
 def carFav(car_id):
     #myform = 
-    if request.method == 'POST' and myform.validate_on_submit(): 
+    if request.method == 'POST': 
         info = {
                 "message": "Car Successfully Favourited",
                 "car_id": 1

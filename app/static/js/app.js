@@ -35,7 +35,7 @@ app.component('app-header', {
             <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/users/{user_id}">UserProfile <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/users/{user_id}">MyProfile <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" to="/upload">Upload <span class="sr-only">(current)</span></router-link>
@@ -87,11 +87,11 @@ const Home = {
 
         <div class="row">
             <div class="col-md-2">
-                <button to="/register" type="submit" class="register typebtn" style="border:2px solid #20B2AA; background-color:#20B2AA; border-radius:25px; color:#FFFFFF;">Register</button>
+                <button @click="goToRegister()" type="submit" class="register typebtn" style="border:2px solid #20B2AA; background-color:#20B2AA; border-radius:25px; color:#FFFFFF;">Register</button>
             </div>
 
             <div class="col-md-2">
-                <button to="/login" type="submit" class="login typebtn" style="border: 2px solid #FFD700; background-color:#FFD700; border-radius:25px; color:#FFFFFF">Login</button>
+                <button @click="goToLogin()" type="submit" class="login typebtn" style="border: 2px solid #FFD700; background-color:#FFD700; border-radius:25px; color:#FFFFFF">Login</button>
             </div>
         </div>
 
@@ -104,6 +104,15 @@ const Home = {
     `,
     data() {
         return {}
+    },
+      methods: {
+        goToRegister(){
+          this.$router.push('/api/register');
+        },
+
+        goToLogin(){
+          this.$router.push('/api/login');
+        }
     }
 };
 //--------------------------------------------------------------
@@ -162,7 +171,7 @@ const RegistrationForm = {
           <label>Upload Photo</label>
           <input class ="form-control" type="file" name="photo">
         </div>
-        <button type="submit" name="submit" class="btn btn-primary">Register</button>
+        <button type="submit" name="submit" class="btn btn-primary" @click="goToProfile()">Register</button>
     </form>
     `,
     data() {
@@ -194,13 +203,17 @@ const RegistrationForm = {
                     self.message = ['bad', jsonResponse.error]
                 }
                 else{
-                    self.message = ['good',[jsonResponse.car.message]]
+                    self.message = ['good',[jsonResponse]]
                 }
                 
                 })
                 .catch(function (error) {
                 console.log(error);
                 });
+        },
+
+        goToProfile(){
+          this.$router.push('/api/users/<user_id>');
         }
     }
 };
@@ -277,54 +290,169 @@ const Login = {
   };
 //--------------------------------------------------------------
 
-const Logout = {
-    name: 'logout',
-    template: `
-    <h2>Logout</h2>
-    <div>
- 
-    </div>
-    `,
-    data() {
-        return {
-            message: []
-        }
-    },
-    methods: {}
-};
-//--------------------------------------------------------------
-
 const Explore = {
     name: 'explore',
     template: `
     <h2>Explore</h2>
-    <div>
- 
+    <div class="form-inline d-flex justify-content-center">
+      <div class="form-group mx-sm-3 mb-2">
+        <label for="search">Make</label>
+        <input type="search" name="make" v-model="searchTerm" id="make" class="form-control mb-2 mr-sm-2"/>
+
+        <label for="search">Model</label>
+        <input type="search" name="model" v-model="searchTerm" id="model" class="form-control mb-2 mr-sm-2"/>
+        
+        <button class="btn btn-primary mb-2" @click="searchCar">Search</button>
+      </div>
     </div>
+
+    <br>
+    <br>
+
+    <div class="car-list d-flex flex-row">
+
+      <ul class="car-list d-flex flex-row flex-wrap">
+
+            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+                <div class="card-body">
+
+                  <div class="card1">
+                    <img v-bind:src =car.urlToImage alt="car photo" class="card-img-top rounded-0"/>
+                  </div>
+
+                  <div class="card-title">
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>Random car Make</h6>
+                    <button class="btn btn-primary mb-2">$100,000</button>
+                  </div>
+
+                  <div class="card-title">
+                    <p>Random car Model</p>
+                  </div>
+
+                  <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
+                    <button class="btn btn-primary mb-2" @click="goToCarDetails">ViewDetails</button>
+                  </div>
+                </div>
+            </div>
+      </ul>
+    </div>    
     `,
     data() {
         return {
             message: []
         }
     },
-    methods: {}
+    methods: {
+       searchCar(){
+          
+      },
+
+      goToCarDetails(){
+        this.$router.push('/cars/{card_id}');
+      }
+    }
 };
 //--------------------------------------------------------------
 
-const UserProfile = {
-    name: 'users',
-    template: `
-    <h2>Users</h2>
+const MyProfile = {
+  name: 'MyProfile',
+  template:`
+    <div class="card" id="myprofile">
+
+      <div class="card-img"> 
+        <img src="/static/img_avatar2.png" class="card-img-top" alt="profilephoto" id="profilephoto">
+      </div>  
+
+      <div class="card-body">
+        <h5 class=card-title>2018 Danicka Patrick</h5>
+        <h3 class=card-title>@dpatrick</h3>
+        <br>
+        <p class="card-text">Some random text until we connect the backend. Same thing for the titles.</p>
+        <br>
+        <br>
+        <p class="card-text text-left">Email: dpatrick@example.com</p>
+        <p class="card-text text-left">Location: Wisconsin, USA</p>
+        <p class="card-text text-left">Joined: April 8,2021</p> 
+      </div>
+    </div>  
+
+    <br>
+    <br>
+
     <div>
- 
+      <h2 class="text-left">Cars Favourited</h2>
     </div>
-    `,
-    data() {
-        return {
-            message: []
-        }
+
+    <div class="car-list d-flex flex-row">
+
+      <ul class="car-list d-flex flex-row flex-wrap">
+
+            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+                <div class="card-body">
+
+                  <div class="card-title">
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>Random car title</h6>
+                  </div>
+
+                  <div class="card1">
+                    <img v-bind:src =car.urlToImage alt="car photo" class="card-img-top rounded-0"/>
+                  </div>
+
+                  <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
+                    <p class="card-text">Random car description</p>
+                  </div>
+                </div>
+            </div>
+      </ul>
+    </div>    
+  `,
+    created()
+    {
+    /*  let self = this;
+
+      fetch("/api/users/{user_id}", {
+          method: 'GET',
+          body: form_data,
+          headers: {
+              'X-CSRFToken': token
+              },
+              credentials: 'same-origin'
+          })
+             .then(function(response){
+                return response.json();
+             })
+             .then(function(data){
+                console.log(data);
+                self.users = data.users;
+             }); */
     },
-    methods: {}
+    data(){
+      return{
+        /*  users: [],
+          searchTerm: '' */
+      }
+    },
+    methods: {
+     /* searchcar(){
+        let self = this;
+
+        fetch('/api/cars'+ self.searchTerm + '&language=en',{
+          method: 'GET',
+          body: form_data,
+          headers: {
+              'X-CSRFToken': token
+              },
+              credentials: 'same-origin'
+          })
+              .then(function(response){
+                return response.json();
+              })
+              .then(function(data){
+                console.log(data);
+                self.cars = data.cars;
+              });
+      } */
+    }
 };
 //--------------------------------------------------------------
 
@@ -596,9 +724,9 @@ const routes = [
     // Put other routes here
     { path: '/register', component: RegistrationForm },
     { path: '/login', component: Login },
-    { path: '/logout', component: Logout },
+    //{ path: '/logout', component: Logout },
     { path: '/explore', component: Explore },
-    { path: '/users/{user_id}', component: UserProfile },
+    { path: '/users/{user_id}', component: MyProfile },
     { path: '/upload', component: UploadForm },
     { path: '/cars/new', component: CarForm },
     { path: '/cars/{card_id}', component: CarDetails },
