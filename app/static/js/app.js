@@ -148,13 +148,13 @@ const RegistrationForm = {
         </div>
   
         <div class= "form-group">
-          <label>Fullname</label>
-          <input type="text" class ="form-control" name="Fullname">
+          <label>Full name</label>
+          <input type="text" class ="form-control" name="Name">
         </div>
   
         <div class= "form-group">
           <label>Email</label>
-          <input type="text" class ="form-control" name="Email">
+          <input type="email" class ="form-control" name="Email">
         </div>
 
         <div class= "form-group">
@@ -203,18 +203,18 @@ const RegistrationForm = {
                     self.message = ['bad', jsonResponse.error]
                 }
                 else{
-                    self.message = ['good',[jsonResponse]]
+                    //self.message = ['good',[jsonResponse]]
                 }
                 
                 })
                 .catch(function (error) {
                 console.log(error);
                 });
-        },
+        }/* ,
 
         goToProfile(){
           this.$router.push('/api/users/<user_id>');
-        }
+        } */
     }
 };
 //--------------------------------------------------------------

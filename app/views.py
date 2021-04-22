@@ -66,7 +66,7 @@ def register():
         filename = secure_filename(photo.filename)
 
         #username, password, name, email, loca, bio, url, date
-        user = Users (username, password, name, email, loc, bio, photo, date_joined)
+        user = Users (username, password, name, email, loc, bio, filename, date_joined)
         #print(user)
         db.session.add(user)
         db.session.commit()

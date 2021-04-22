@@ -19,18 +19,16 @@ class Users(db.Model):
     photo = db.Column(db.String(255))
     date_joined = db.Column(db.Date)
     
-    def __init__(self, first_name, last_name, username, password):
-        self.first_name = first_name
+    def __init__(self, fullname, username, password):
+        self.name = fullname
         self.last_name = last_name
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
         
-    def __init__(self, username, password, name, email, loca, bio, url, date):
-        self.first_name = first_name
-        self.last_name = last_name
+    def __init__(self, username, password, fullname, email, loca, bio, url, date):
+        self.name = fullname
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
-        self.name = name
         self.email = email
         self.location = loca
         self.biography = bio
