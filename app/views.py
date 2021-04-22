@@ -5,15 +5,22 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 
-from app import app
+from app import app, db, login_manager
 from flask import render_template, request
 
 import os
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
-from .forms import CarForm
+from .forms import CarForm, RegistrationForm, LoginForm
 from flask import send_from_directory
 from flask import jsonify
+
+from flask_login import login_user, logout_user, current_user, login_required
+from app.models import Users, Cars, Favourites
+from werkzeug.security import check_password_hash
+
+from datetime import date
+import jwt
 
 ###
 # Routing for your application.
@@ -39,6 +46,49 @@ def upload():
             
         error = form_errors(myform)
         return jsonify(error= error)
+
+
+@app.route("/api/register", methods=["POST"])
+def register():
+    myform = RegistrationForm()
+    if request.method == 'POST' and myform.validate_on_submit():
+        # Get file data and save to your uploads folder
+        username = myform.Username.data
+        password = myform.Password.data
+        name = myform.Name.data
+        email = myform.Email.data
+        loc = myform.Location.data
+        bio = myform.Biography.data
+        photo = myform.photo.data
+        date_joined = date.today()
+
+        filefolder = app.config['UPLOAD_FOLDER']
+        filename = secure_filename(photo.filename)
+
+        #username, password, name, email, loca, bio, url, date
+        user = Users (username, password, name, email, loc, bio, photo, date_joined)
+        #print(user)
+        db.session.add(user)
+        db.session.commit()
+
+        #rootdir = os.getcwd()
+        photo.save(os.path.join(filefolder,filename))
+
+        info = {
+            "id": user.id,
+            "username": user.username,
+            "name": user.name,
+            "photo": user.photo,
+            "email": user.email,
+            "location": user.location,
+            "biography": user.biography,
+            "date_joined": user.date_joined
+            }
+        return  jsonify(info=info)
+
+    error = form_errors(myform)
+    return jsonify(error= error)
+
 
 @app.route('/api/cars', methods=['POST', 'GET'])
 def cars():
@@ -103,6 +153,7 @@ def cars():
     error = form_errors(myform)
     return jsonify(error= error)
 
+
 @app.route("/api/car/<car_id>", methods=["GET"])
 def car(car_id):
     #myform =
@@ -123,6 +174,7 @@ def car(car_id):
     #error = form_errors(myform)
     #return jsonify(error= error)
 
+
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])
 def carFav(car_id):
     #myform = 
@@ -141,6 +193,7 @@ def carFav(car_id):
 
     #error = form_errors(myform)
     #return jsonify(error= error)
+
 
 @app.route("/api/search", methods=["GET"])
 def search():
@@ -174,6 +227,7 @@ def search():
     ]
     return  jsonify(cars=results)
 
+
 @app.route("/api/users/<user_id>", methods=["GET"])
 def users(user_id):
     user = {
@@ -187,6 +241,7 @@ def users(user_id):
         "date_joined": "2021-04-05 17:53:00"
     }
     return  jsonify(user=user)
+
 
 @app.route("/api/car/<user_id>/favourites", methods=["GET"])
 def userFav(user_id):
@@ -219,6 +274,64 @@ def userFav(user_id):
         }
     ]
     return  jsonify(cars=results)
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+    form = LoginForm()
+    if request.method == "POST":
+        # change this to actually validate the entire form submission
+        # and not just one field
+        #if form.username.data:
+        if form.validate_on_submit():
+            usern = form.username.data
+            passw = form.password.data
+
+            user = Users.query.filter_by(username= usern)
+
+            # Get the username and password values from the form.
+            user = Users.query.filter_by(username= usern).first()
+            # using your model, query database for a user based on the username
+            # and password submitted. Remember you need to compare the password hash.
+            # You will need to import the appropriate function to do so.
+            # Then store the result of that query to a `user` variable so it can be
+            # passed to the login_user() method below.
+            
+            if user and check_password_hash(user.password, passw):
+                # get user id, load into session
+                login_user(user)
+                
+                secret = app.config['SECRET_KEY']
+                payload = {'id': user.id, 'name': user.name}
+                encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
+
+                info = {
+                    "message": "Login Successful",
+                    "token": encoded_jwt
+                 }
+
+                # remember to flash a message to the user
+                #flash('Logged in successfully.', 'success')
+                #return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
+                return  jsonify(info=info)
+    #return render_template("login.html", form=form)
+    error = form_errors(form)
+    return jsonify(error= error)
+
+
+@app.route("/api/auth/logout")
+@login_required
+def logout():
+    # Logout the user and end the session
+    logout_user()
+    flash('You have been logged out.', 'danger')
+    return redirect(url_for('index'))
+
+# user_loader callback. This callback is used to reload the user object from
+# the user ID stored in the session
+@login_manager.user_loader
+def load_user(id):
+    return Users.query.get(int(id))
 
 
 # Please create all new routes and view functions above this route.
@@ -256,7 +369,6 @@ def form_errors(form):
 ###
 # The functions below should be applicable to all Flask apps.
 ###
-
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):

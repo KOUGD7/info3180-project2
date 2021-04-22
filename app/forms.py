@@ -4,7 +4,7 @@ from wtforms import StringField
 from wtforms import SelectField
 from wtforms import PasswordField
 from wtforms.widgets import TextArea
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, InputRequired
 
 
 
@@ -14,6 +14,11 @@ class UploadForm (FlaskForm):
         FileRequired(),
         FileAllowed(['jpg', 'png', 'Images only!'])
     ])
+
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[InputRequired()])
 
 class RegistrationForm (FlaskForm):
     Username = StringField('Username', validators=[DataRequired()])
