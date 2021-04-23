@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, SelectField, PasswordField 
+from wtforms import StringField, SelectField, PasswordField, HiddenField
 from wtforms.fields.html5 import EmailField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, InputRequired
@@ -40,6 +40,7 @@ class CarForm (FlaskForm):
     Colour = StringField('Colour', validators=[DataRequired()])
     Year = StringField('Year', validators=[DataRequired()])
     Price = StringField('Price', validators=[DataRequired()])
+    User = HiddenField('User', validators=[DataRequired()])
     
     choices1 = [('SUV', 'SUV'), ('Sedan', 'Sedan'), ('Hatch', 'Hatch'), ('Truck','Truck')]
     Car_Type = SelectField("Car Type", choices = choices1, default = ['SUV'])

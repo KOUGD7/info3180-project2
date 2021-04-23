@@ -44,12 +44,18 @@ app.component('app-header', {
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
           </li>
         <li class="nav-item active">
-          <router-link v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link>
+          <a @click="LogoutP" v-if="seen" class="nav-link">Logout <span class="sr-only">(current)</span></a>
+          <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
         </li>
         </ul>
         </div>
     </nav>
     `,
+    created(){
+      let self = this;
+      self.seen = localStorage.auth;
+      console.log(self.seen)
+    },
     data() {
       return {
         user: [],
@@ -75,6 +81,36 @@ app.component('app-header', {
       let uid = localStorage.uid
       router.push(`/users/${uid}`);
 
+    },
+    LogoutP(){
+      let self = this;
+      //self.seen = false;
+      localStorage.auth = false;
+      fetch('/api/auth/logout',{
+        method: 'GET',
+        headers: {
+        // 'Authorization': 'Bearer <>'
+        'X-CSRFToken': token
+      },
+      credentials: 'same-origin'
+    })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        console.log(data);
+        localStorage.removeItem('uid')
+        localStorage.removeItem('token')
+        //localStorage.removeItem('auth')
+        console.log(localStorage.auth)
+
+        router.push('/login');
+      }) 
+      .catch(function (error) {
+        console.log(error);
+      });
+      
+      //self.seen = false
     }
     
   }
@@ -362,15 +398,14 @@ const Logout = {
         localStorage.removeItem('uid')
         localStorage.removeItem('token')
 
-        console.log(localStorage.auth)
-        localStorage.removeItem('auth')
+        //localStorage.removeItem('auth')
         console.log(localStorage.auth)
 
         router.push('/login');
       }) 
       .catch(function (error) {
         console.log(error);
-      });;
+      });
       
     }
 
@@ -406,7 +441,7 @@ const Explore = {
                 <div class="card-body">
 
                   <div class="card1">
-                    <img v-bind:src =car.photo alt="car photo" class="card-img-top rounded-0"/>
+                    <img v-bind:src = car.photo alt="car photo" class="card-img-top rounded-0"/>
                   </div>
 
                   <div class="card-title">
@@ -442,7 +477,6 @@ const Explore = {
       .then(function(data) {
         console.log(data);
         self.cars = data.cars;
-
       });
     },
     data() {
@@ -568,7 +602,7 @@ const User = {
     <div class="card" id="myprofile">
 
       <div class="card-img"> 
-        <img src="/static/img_avatar2.png" class="card-img-top" alt="profilephoto" id="profilephoto">
+        <img v-bind:src = user.photo class="card-img-top" alt="profilephoto" id="profilephoto">
       </div>  
 
       <div class="card-body">
@@ -704,6 +738,8 @@ const CarForm = {
           <label>Year</label>
           <input type="text" class ="form-control" name="Year">
         </div>
+
+        <input type="hidden" class ="form-control" name="User" :value=uid>
   
         <div class= "form-group">
           <label>Price</label>
@@ -742,7 +778,8 @@ const CarForm = {
     `,
     data() {
         return {
-            message: []
+            message: [],
+            uid: localStorage.uid
         }
     },
     methods: {
@@ -769,7 +806,7 @@ const CarForm = {
                     self.message = ['bad', jsonResponse.error]
                 }
                 else{
-                    self.message = ['good',[jsonResponse.car.message]]
+                    self.message = ['good',["Car Sucessfully Added"]]
                 }
                 
                 })
