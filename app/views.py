@@ -26,29 +26,6 @@ import jwt
 # Routing for your application.
 ###
 
-@app.route('/api/upload', methods=['POST'])
-@login_required
-def upload():
-    myform = UploadForm()
-    if request.method == 'POST':
-        if myform.validate_on_submit():
-            # Get file data and save to your uploads folder
-            description = myform.description.data
-            photo = myform.photo.data
-
-            filefolder = app.config['UPLOAD_FOLDER']
-            filename = secure_filename(photo.filename)
-
-            #rootdir = os.getcwd()
-            photo.save(os.path.join(filefolder,filename))
-
-            info = {'message': 'File Upload Successful', 'filename': filename, 'description': description}
-            return  jsonify(info=info)
-            
-        error = form_errors(myform)
-        return jsonify(error= error)
-
-
 @app.route("/api/register", methods=["POST"])
 def register():
     myform = RegistrationForm()
@@ -341,8 +318,10 @@ def login():
 def logout():
     # Logout the user and end the session
     logout_user()
-    flash('You have been logged out.', 'danger')
-    return redirect(url_for('index'))
+    #flash('You have been logged out.', 'danger')
+    info = {"message": "You were sucessfully logged out"}
+    return  jsonify(info=info)
+    #return redirect(url_for('index'))
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session

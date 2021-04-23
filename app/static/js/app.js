@@ -20,40 +20,55 @@ app.component('app-header', {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+            <router-link v-if="seen" class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
+          <li class="nav-item active">
+            <router-link v-if="seen" class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
+          </li>
+          <li class="nav-item active">
+            <a v-if="seen" class="nav-link" @click="myProfile">MyProfile <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <router-link v-if="seen" class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
+          </li>
+          <li class="nav-item active">
+            <router-link v-if="seen" class="nav-link" to="/cars/{card_id}">Car Details <span class="sr-only">(current)</span></router-link>
+          </li>
+        </ul>
+        
+        <ul class = "navbar-nav mr-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/register">Register <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
           </li>
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" @click="myProfile">MyProfile <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/upload">Upload <span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/cars/{card_id}">Car Details <span class="sr-only">(current)</span></router-link>
-          </li>
+        <li class="nav-item active">
+          <router-link v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link>
+        </li>
         </ul>
-      </div>
+        </div>
     </nav>
     `,
     data() {
       return {
-          user: [],
+        user: [],
+        seen: localStorage.auth,
       }
+      /**if("auth" in localStorage){
+        console.log(localStorage.auth)
+        return {
+          user: [],
+          seen: true,
+        }
+      }
+      else{
+        console.log(localStorage.auth)
+        return {
+          user: [],
+          seen: false,
+        }
+      }**/
   },
   methods: {
     myProfile(){
@@ -309,7 +324,8 @@ const Login = {
               //Store User Infomation in Local Storage
               localStorage.uid = payload.id
               localStorage.token = token
-
+              localStorage.auth = true
+              router.push('/explore');
               }
               })
               .catch(function (error) {
@@ -318,7 +334,47 @@ const Login = {
               });
         }
     }
-  };
+};
+
+//------------------------------------------------------------
+const Logout = {
+    name: 'logout',
+    template: `<h1></h1>`,
+    data() {
+        return {
+            message: []
+        }
+    },
+    created(){
+      fetch('/api/auth/logout',{
+        method: 'GET',
+        headers: {
+        // 'Authorization': 'Bearer <>'
+        'X-CSRFToken': token
+      },
+      credentials: 'same-origin'
+    })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        console.log(data);
+        localStorage.removeItem('uid')
+        localStorage.removeItem('token')
+
+        console.log(localStorage.auth)
+        localStorage.removeItem('auth')
+        console.log(localStorage.auth)
+
+        router.push('/login');
+      }) 
+      .catch(function (error) {
+        console.log(error);
+      });;
+      
+    }
+
+};
 
 //--------------------------------------------------------------
 const Explore = {
@@ -329,10 +385,10 @@ const Explore = {
     <div class="form-inline d-flex justify-content-center">
       <div class="form-group mx-sm-3 mb-2">
         <label for="search">Make</label>
-        <input type="search" name="make" v-model="searchTerm" id="make" class="form-control mb-2 mr-sm-2"/>
+        <input type="search" name="make" id="make" class="form-control mb-2 mr-sm-2"/>
 
         <label for="search">Model</label>
-        <input type="search" name="model" v-model="searchTerm" id="model" class="form-control mb-2 mr-sm-2"/>
+        <input type="search" name="model" id="model" class="form-control mb-2 mr-sm-2"/>
         
         <button class="btn btn-primary mb-2">Search</button>
       </div>
@@ -722,93 +778,7 @@ const CarForm = {
                 });
         }
     }
-  };
-
-//----------------------------------------------------------------
-const UploadForm = {
-  name: 'upload-form',
-  template: `
-  <h2>Upload Form</h2>
-  <div v-if="message[0] == 'good'">
-      <div class="alert alert-success" role="alert">
-          <ul v-for="m in message[1]" > 
-              <li>{{ m }}</li>
-          </ul>
-      </div>
-  </div>
-  <div v-if="message[0] == 'bad'">
-      <div class="alert alert-warning" role="alert">
-          <ul v-for="m in message[1]"> 
-              <p>{{ m }}</p>
-          </ul>
-      </div>
-  </div>
-  
-  <form @submit.prevent="uploadPhoto" id="uploadForm" method="post">
-      <div class= "form-group">
-          <label>Description</label>
-          <textarea class ="form-control" name="description" placeholder="Description"></textarea>
-      </div>
-      <div class = "form-group">
-          <label>Photo Upload</label>
-          <input class ="form-control" type="file" name="photo">
-      </div>
-      <button type="submit" name="submit" class="btn btn-primary">Upload</button>
-  </form>
-  `,
-  data() {
-      return {
-          message: []
-      }
-  },
-  methods: {
-      uploadPhoto(){
-          let self = this;
-          let uploadForm = document.getElementById('uploadForm');
-          let form_data = new FormData(uploadForm);
-
-          fetch("/api/upload", {
-              method: 'POST',
-              body: form_data,
-              headers: {
-                  'X-CSRFToken': token
-                  },
-                  credentials: 'same-origin'
-              })
-              .then(function (response) {
-              return response.json();
-              })
-              .then(function (jsonResponse) {
-              // display a success message
-              console.log(jsonResponse);
-              if(jsonResponse.error){
-                  self.message = ['bad', jsonResponse.error]
-              }
-              else{
-                  self.message = ['good',[jsonResponse.info.message]]
-              }
-              
-              })
-              .catch(function (error) {
-              console.log(error);
-              });
-      }
-  }
 };
-
-//----------------------------------------------------------------
-/*const Home = {
-    name: 'Home',
-    template: `
-    <div class="jumbotron">
-        <h1>United Auto Sales</h1>
-        <p class="lead">In this lab we will demonstrate VueJS working with Forms and Form Validation from Flask-WTF.</p>
-    </div>
-    `,
-    data() {
-        return {}
-    }
-};*/
 
 const NotFound = {
     name: 'NotFound',
@@ -828,10 +798,9 @@ const routes = [
     // Put other routes here
     { path: '/register', component: RegistrationForm },
     { path: '/login', component: Login },
-    //{ path: '/logout', component: Logout },
+    { path: '/logout', component: Logout },
     { path: '/explore', component: Explore },
     { path: '/users/:user_id', component: User },
-    { path: '/upload', component: UploadForm },
     { path: '/cars/new', component: CarForm },
     { path: '/cars/:car_id', component: CarDetails },
     // This is a catch all route in case none of the above matches
