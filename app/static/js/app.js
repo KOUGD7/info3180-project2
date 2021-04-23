@@ -120,14 +120,15 @@ const Home = {
     },
       methods: {
         goToRegister(){
-          this.$router.push('/api/register');
+          this.$router.push('/register');
         },
 
         goToLogin(){
-          this.$router.push('/api/login');
+          this.$router.push('/login');
         }
     }
 };
+
 //--------------------------------------------------------------
 const RegistrationForm = {
     name: 'registration-form',
@@ -230,8 +231,8 @@ const RegistrationForm = {
         } */
     }
 };
-//--------------------------------------------------------------
 
+//--------------------------------------------------------------
 const Login = {
     name: 'login',
     template: `
@@ -301,8 +302,8 @@ const Login = {
         }*/
     }
   };
-//--------------------------------------------------------------
 
+//--------------------------------------------------------------
 const Explore = {
     name: 'explore',
     template: `
