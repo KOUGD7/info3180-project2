@@ -27,6 +27,7 @@ import jwt
 ###
 
 @app.route('/api/upload', methods=['POST'])
+@login_required
 def upload():
     myform = UploadForm()
     if request.method == 'POST':
@@ -91,6 +92,7 @@ def register():
 
 
 @app.route('/api/cars', methods=['POST', 'GET'])
+@login_required
 def cars():
     myform = CarForm()
     if request.method == 'POST': 
@@ -155,6 +157,7 @@ def cars():
 
 
 @app.route("/api/cars/<car_id>", methods=["GET"])
+@login_required
 def car(car_id):
     #myform =
     if request.method == 'GET':
@@ -177,6 +180,7 @@ def car(car_id):
 
 
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])
+@login_required
 def carFav(car_id):
     #myform = 
     if request.method == 'POST': 
@@ -197,6 +201,7 @@ def carFav(car_id):
 
 
 @app.route("/api/search", methods=["GET"])
+@login_required
 def search():
     myform = SearchForm()
     if request.method == 'GET':
@@ -237,6 +242,7 @@ def search():
 
 
 @app.route("/api/users/<user_id>", methods=["GET"])
+@login_required
 def users(user_id):
     user = {
         "id": 1,
@@ -252,6 +258,7 @@ def users(user_id):
 
 
 @app.route("/api/car/<user_id>/favourites", methods=["GET"])
+@login_required
 def userFav(user_id):
     results = [
         {
@@ -286,14 +293,14 @@ def userFav(user_id):
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    form = LoginForm()
+    myform = LoginForm()
     if request.method == "POST":
         # change this to actually validate the entire form submission
         # and not just one field
         #if form.username.data:
-        if form.validate_on_submit():
-            usern = form.username.data
-            passw = form.password.data
+        if myform.validate_on_submit():
+            usern = myform.Username.data
+            passw = myform.Password.data
 
             user = Users.query.filter_by(username= usern)
 
@@ -312,18 +319,20 @@ def login():
                 secret = app.config['SECRET_KEY']
                 payload = {'id': user.id, 'name': user.name}
                 encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
-
+                
                 info = {
                     "message": "Login Successful",
-                    "token": encoded_jwt
+                    "token": encoded_jwt.decode('UTF-8')
                  }
 
                 # remember to flash a message to the user
                 #flash('Logged in successfully.', 'success')
                 #return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
                 return  jsonify(info=info)
+            info = {"message": "Invalid Username/ Password"}
+            return  jsonify(info=info)
     #return render_template("login.html", form=form)
-    error = form_errors(form)
+    error = form_errors(myform)
     return jsonify(error= error)
 
 

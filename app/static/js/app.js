@@ -57,7 +57,7 @@ app.component('app-header', {
   },
   methods: {
     myProfile(){
-      let uid = 1
+      let uid = localStorage.uid
       router.push(`/users/${uid}`);
 
     }
@@ -198,6 +198,7 @@ const RegistrationForm = {
             let self = this;
             let uploadprofile = document.getElementById('uploadprofile');
             let form_data = new FormData(uploadprofile);
+            console.log(form_data);
   
             fetch("/api/register", {
                 method: 'POST',
@@ -252,16 +253,16 @@ const Login = {
         </div>
     </div>
     
-    <form @submit.prevent="login" id="login" method="post">
+    <form @submit.prevent="loginPro" id="loginForm" method="post">
   
         <div class= "form-group">
           <label>Username</label>
-          <input type="text" class ="form-control" name="Username">
+          <input type="text" class ="form-control" id="username" name="Username">
         </div>
   
         <div class= "form-group">
           <label>Password</label>
-          <input type="password" class ="form-control" name="Password">
+          <input type="password" class ="form-control" id="password" name="Password">
         </div>
     
         <button type="submit" name="submit" class="btn btn-primary">Login</button>
@@ -273,33 +274,49 @@ const Login = {
         }
     },
     methods: {
-     /*   Login(){
+      loginPro(){
+        let self = this;
+        let loginF = document.getElementById('loginForm');
+        let form_data = new FormData(loginF);
+        /* let p = document.getElementById('username').value;
+        let l = document.getElementById('password').value;
+        console.log(form_data)
+        console.log(p)
+        console.log(l)*/
+        fetch("/api/auth/login", {
+          method: 'POST',
+          body: form_data,
+          headers: {
+              'X-CSRFToken': token
+              },
+              credentials: 'same-origin'
+          })
+          .then(function (response) {
+             return response.json();
+            })
+          .then(function (jsonResponse) {
+          // display a success message
+            console.log(jsonResponse);
+            if(jsonResponse.error){
+              self.message = ['bad', jsonResponse.error]
+              }
+            else{
+              self.message = ['good',[jsonResponse.info.message]]
+              let token = jsonResponse.info.token
+              const tokenParts = token.split('.')
+              const payload = JSON.parse(atob(tokenParts[1]))
+              console.log(payload)
+              //Store User Infomation in Local Storage
+              localStorage.uid = payload.id
+              localStorage.token = token
 
-            fetch("/api/login", {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': token
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(function (response) {
-                return response.json();
-                })
-                .then(function (jsonResponse) {
-                // display a success message
-                console.log(jsonResponse);
-                if(jsonResponse.error){
-                    self.message = ['bad', jsonResponse.error]
-                }
-                else{
-                    self.message = ['good',[jsonResponse.car.message]]
-                }
-                
-                })
-                .catch(function (error) {
+              }
+              })
+              .catch(function (error) {
                 console.log(error);
-                });
-        }*/
+              
+              });
+        }
     }
   };
 
