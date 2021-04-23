@@ -590,7 +590,6 @@ const User = {
 };
 
 //--------------------------------------------------------------
-
 const CarForm = {
     name: 'upload-form',
     template: `
@@ -614,27 +613,27 @@ const CarForm = {
   
         <div class= "form-group">
           <label>Make</label>
-          <input type="text" class ="form-control" name="Make"></input>
+          <input type="text" class ="form-control" name="Make">
         </div>
   
         <div class= "form-group">
           <label>Model</label>
-          <input type="text" class ="form-control" name="Model"></input>
+          <input type="text" class ="form-control" name="Model">
         </div>
   
         <div class= "form-group">
           <label>Colour</label>
-          <input type="text" class ="form-control" name="Colour"></input>
+          <input type="text" class ="form-control" name="Colour">
         </div>
   
         <div class= "form-group">
           <label>Year</label>
-          <input type="text" class ="form-control" name="Year"></input>
+          <input type="text" class ="form-control" name="Year">
         </div>
   
         <div class= "form-group">
           <label>Price</label>
-          <input type="text" class ="form-control" name="Price"></input>
+          <input type="text" class ="form-control" name="Price">
         </div>
   
         <div class= "form-group">
