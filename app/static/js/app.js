@@ -185,7 +185,7 @@ const RegistrationForm = {
           <label>Upload Photo</label>
           <input class ="form-control" type="file" name="photo">
         </div>
-        <button type="submit" name="submit" class="btn btn-primary" @click="goToProfile()">Register</button>
+        <button type="submit" name="submit" class="btn btn-primary">Register</button>
     </form>
     `,
     data() {
