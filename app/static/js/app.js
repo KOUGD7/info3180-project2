@@ -307,7 +307,7 @@ const Explore = {
     name: 'explore',
     template: `
     <h2>Explore</h2>
-    <form @submit.prevent="searchCar" id="searchForm" method="post">
+    <form @submit.prevent="searchCar" id="searchForm" method="get">
     <div class="form-inline d-flex justify-content-center">
       <div class="form-group mx-sm-3 mb-2">
         <label for="search">Make</label>
@@ -380,13 +380,13 @@ const Explore = {
     methods: {
        searchCar(){
         let self = this;
-        let sForm = document.getElementById('searchForm');
-        let form_data = new FormData(sForm);
-        //console.log(form_data);
+        let model = document.getElementById('model').value;
+        let make = document.getElementById('make').value;
+        //console.log(model);
+        //console.log(make);
 
-        fetch("/api/search", {
+        fetch(`/api/search?model=${model}&make=${make}`, {
             method: 'GET',
-            data: form_data,
             headers: {
                 'X-CSRFToken': token
                 },

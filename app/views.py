@@ -116,7 +116,7 @@ def cars():
             info = {'message': 'File Upload Successful', 'filename': filename, 'description': Descrip}
             return  jsonify(car=car)
 
-            error = form_errors(myform)
+        error = form_errors(myform)
         return jsonify(error= error)
 
     if request.method == 'GET':
@@ -200,7 +200,9 @@ def carFav(car_id):
 def search():
     myform = SearchForm()
     if request.method == 'GET':
-        #print(myform.model.data)
+        print(request.args.get('model'))
+        print(request.args.get('make'))
+        print(request)
         results = [
             {
             "id": 123,
