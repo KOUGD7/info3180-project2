@@ -666,6 +666,9 @@ const User = {
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
                     <p class="card-text">{{car.description}}</p>
                   </div>
+                  <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
+                    <button class="btn btn-primary mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
+                  </div>
                 </div>
             </div>
       </ul>
@@ -707,6 +710,12 @@ const User = {
                     console.log(data);
                     self.favourites = data.cars;
                  });
+    },
+    methods: {
+      goToCarDetails(cid){
+        this.$router.push(`/cars/${cid}`);
+
+      }
     },
     data(){
       return{
