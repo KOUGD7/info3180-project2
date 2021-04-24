@@ -11,44 +11,46 @@ const app = Vue.createApp({
 app.component('app-header', {
     name: 'AppHeader',
     template: `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand" href="#">United Auto Sales</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
+      <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+            <router-link class="nav-link" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
+            </li>
+      </ul>
+      
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
     
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul v-if="seen" class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <a v-if="seen" class="nav-link" @click="myProfile">MyProfile <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/cars/{card_id}">Car Details <span class="sr-only">(current)</span></router-link>
+            <a class="nav-link" @click="myProfile">My Profile<span class="sr-only">(current)</span></a>
           </li>
         </ul>
         
-        <ul class = "navbar-nav mr-auto">
+        <ul v-if="seen" class = "navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a @click="LogoutP" class="nav-link">Logout <span class="sr-only">(current)</span></a>
+            <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
+          </li>
+        </ul>
+        <ul v-else class = "navbar-nav mr-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/register">Register <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
           </li>
-        <li class="nav-item active">
-          <a @click="LogoutP" v-if="seen" class="nav-link">Logout <span class="sr-only">(current)</span></a>
-          <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
-        </li>
         </ul>
-        </div>
+      </div>
     </nav>
     `,
     created(){
@@ -85,10 +87,11 @@ app.component('app-header', {
     LogoutP(){
       let self = this;
       //self.seen = false;
-      localStorage.auth = false;
+      //localStorage.auth = false;
       fetch('/api/auth/logout',{
         method: 'GET',
         headers: {
+          Authorization: "Bearer " + localStorage.token,
         // 'Authorization': 'Bearer <>'
         'X-CSRFToken': token
       },
@@ -101,10 +104,10 @@ app.component('app-header', {
         console.log(data);
         localStorage.removeItem('uid')
         localStorage.removeItem('token')
-        //localStorage.removeItem('auth')
+        localStorage.removeItem('auth')
         console.log(localStorage.auth)
 
-        router.push('/login');
+        router.push('/');
       }) 
       .catch(function (error) {
         console.log(error);
@@ -136,6 +139,7 @@ app.component('app-footer', {
 const Home = {
     name: 'Home',
     template: `
+    <app-header></app-header>
     <div class="row home-page" style="width:100%;">
       <div class="column home-des" style="float:left; width:50%; height:100%;">
         <div class="row">
@@ -184,6 +188,7 @@ const Home = {
 const RegistrationForm = {
     name: 'registration-form',
     template: `
+    <app-header></app-header>
     <h2>Register New User</h2>
     <div v-if="message[0] == 'good'">
         <div class="alert alert-success" role="alert">
@@ -249,7 +254,6 @@ const RegistrationForm = {
             let self = this;
             let uploadprofile = document.getElementById('uploadprofile');
             let form_data = new FormData(uploadprofile);
-            console.log(form_data);
   
             fetch("/api/register", {
                 method: 'POST',
@@ -288,6 +292,7 @@ const RegistrationForm = {
 const Login = {
     name: 'login',
     template: `
+    <app-header></app-header>
     <h2>Login to your account</h2>
     <div v-if="message[0] == 'good'">
         <div class="alert alert-success" role="alert">
@@ -356,7 +361,7 @@ const Login = {
               let token = jsonResponse.info.token
               const tokenParts = token.split('.')
               const payload = JSON.parse(atob(tokenParts[1]))
-              console.log(payload)
+              //console.log(payload)
               //Store User Infomation in Local Storage
               localStorage.uid = payload.id
               localStorage.token = token
@@ -375,7 +380,7 @@ const Login = {
 //------------------------------------------------------------
 const Logout = {
     name: 'logout',
-    template: `<h1></h1>`,
+    template: `<app-header></app-header>`,
     data() {
         return {
             message: []
@@ -385,6 +390,7 @@ const Logout = {
       fetch('/api/auth/logout',{
         method: 'GET',
         headers: {
+        Authorization: "Bearer " + localStorage.token,
         // 'Authorization': 'Bearer <>'
         'X-CSRFToken': token
       },
@@ -397,11 +403,9 @@ const Logout = {
         console.log(data);
         localStorage.removeItem('uid')
         localStorage.removeItem('token')
-
-        //localStorage.removeItem('auth')
+        localStorage.removeItem('auth')
         console.log(localStorage.auth)
-
-        router.push('/login');
+        router.push('/');
       }) 
       .catch(function (error) {
         console.log(error);
@@ -415,6 +419,7 @@ const Logout = {
 const Explore = {
     name: 'explore',
     template: `
+    <app-header></app-header>
     <h2>Explore</h2>
     <form @submit.prevent="searchCar" id="searchForm" method="get">
     <div class="form-inline d-flex justify-content-center">
@@ -466,7 +471,8 @@ const Explore = {
       fetch('/api/cars',{
         method: 'GET',
         headers: {
-        // 'Authorization': 'Bearer <>'
+        // JWT requires the Authorization schema to be `Bearer` instead of `Basic`
+        Authorization: "Bearer " + localStorage.token,
         'X-CSRFToken': token
       },
       credentials: 'same-origin'
@@ -476,7 +482,13 @@ const Explore = {
       })
       .then(function(data) {
         console.log(data);
-        self.cars = data.cars;
+        if(data.code){
+          router.push('/login');
+        }
+        else{
+          self.cars = data.cars;
+        }
+        
       });
     },
     data() {
@@ -496,6 +508,7 @@ const Explore = {
         fetch(`/api/search?model=${model}&make=${make}`, {
             method: 'GET',
             headers: {
+              Authorization: "Bearer " + localStorage.token,
                 'X-CSRFToken': token
                 },
                 credentials: 'same-origin'
@@ -509,9 +522,7 @@ const Explore = {
             if(jsonResponse.error){
                 self.message = ['bad', jsonResponse.error]
             }
-            else{
-              self.cars = jsonResponse.cars;
-            }
+            self.cars = jsonResponse.cars;
             
             })
             .catch(function (error) {
@@ -530,7 +541,12 @@ const Explore = {
 const CarDetails = {
   name: 'car-details',
   template: `
+  <app-header></app-header>
   <div class="card" id="card-details">
+<<<<<<< HEAD
+=======
+    <img v-bind:src = car.photo class="card-img-top" alt="cars Logo" id="card-img">
+>>>>>>> 92aeac63716b37e20557a00d3f623a8f1ad12c53
     
       <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
     
@@ -559,11 +575,19 @@ const CarDetails = {
           </div>
         </div>
 
+<<<<<<< HEAD
         <div class="row" id="prop-btn">
             <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
             <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car_id)">Like</button>
             <i class="bi bi-heart"></i>
         </div>
+=======
+      <div class="row" id="prop-btn">
+          <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+          <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car.id)">Like</button>
+          <i class="bi bi-heart"></i>
+      </div>
+>>>>>>> 92aeac63716b37e20557a00d3f623a8f1ad12c53
     </div>
   </div>
   `,
@@ -574,11 +598,14 @@ const CarDetails = {
       }
   },
   methods: {
-    addToFavourites(){
+    addToFavourites(car_id){
       let self = this;
-      fetch(`api/users/{user_id}/favourites/${self.$route.params.car_id}`,{
-        method: 'GET',
+      let host = window.location.protocol + "//" + window.location.host;
+      //fetch(`api/cars/${car_id}/favourite`,{
+      fetch(`${host}/api/cars/${car_id}/favourite`,{
+        method: 'POST',
         headers: {
+          Authorization: "Bearer " + localStorage.token,
           'X-CSRFToken': token
           },
           credentials: 'same-origin'
@@ -588,16 +615,16 @@ const CarDetails = {
       })
              .then(function(data){
                 console.log(data);
-                self.car = data.car;
+                //self.car = data.car;
       });
     }
-
   },
   created() {
     let self = this;
     fetch(`/api/cars/${self.$route.params.car_id}`,{
       method: 'GET', 
       headers: {
+      Authorization: "Bearer " + localStorage.token,
       // 'Authorization': 'Bearer <>'
       'X-CSRFToken': token
     },
@@ -618,6 +645,7 @@ const CarDetails = {
 const User = {
   name: 'user',
   template:`
+    <app-header></app-header>
     <div class="card" id="myprofile">
 
       <div class="card-img"> 
@@ -648,22 +676,20 @@ const User = {
 
       <ul class="car-list d-flex flex-row flex-wrap">
 
-            <div v-for="result in results" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+            <div v-for="car in favourites" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
                 <div class="card-body">
 
+                  <div class="card-title">
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.year}} {{car.make}} {{car.model}}</h6>
+                  </div>
+
                   <div class="card1">
-                    <img v-bind:src =result.photo alt="car photo" class="card-img-top rounded-0"/>
+                    <img v-bind:src =car.photo alt="car photo" class="card-img-top rounded-0"/>
                   </div>
 
-                  <div class="row card-title">
-                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{result.year}}{{result.make}}</h6>
-                    <div>{{results.price}}</div>
+                  <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
+                    <p class="card-text">{{car.description}}</p>
                   </div>
-
-                  <div class="row card-title">
-                    <p class="card-title m1-2 mb-0 pb-0">{{results.model}}</p>
-                  </div>
-
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
                     <button class="btn btn-primary mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
                   </div>
@@ -675,10 +701,12 @@ const User = {
     created()
     {
       let self = this;
+      let uid = localStorage.uid
 
       fetch(`/api/users/${self.$route.params.user_id}`, {
           method: 'GET',
           headers: {
+            Authorization: "Bearer " + localStorage.token,
               'X-CSRFToken': token
               },
               credentials: 'same-origin'
@@ -688,20 +716,40 @@ const User = {
              })
              .then(function(data){
                 console.log(data);
+                if(data.code){
+                  router.push('/login');
+                }
                 self.user = data.user;
              });
-    },
-    data(){
-      return{
-        user: [],
-        /*  
-          searchTerm: '' */
-      }
+
+      fetch(`/api/users/${uid}/favourites`, {
+              method: 'GET',
+              headers: {
+                Authorization: "Bearer " + localStorage.token,
+                  'X-CSRFToken': token
+                  },
+                  credentials: 'same-origin'
+              })
+                 .then(function(response){
+                    return response.json();
+                 })
+                 .then(function(data){
+                    console.log(data);
+                    self.favourites = data.cars;
+                 });
     },
     methods: {
       goToCarDetails(cid){
         this.$router.push(`/cars/${cid}`);
-    }
+
+      }
+    },
+    data(){
+      return{
+        user: [],
+        favourites: []
+  
+      }
   }
 };
 
@@ -709,6 +757,7 @@ const User = {
 const CarForm = {
     name: 'upload-form',
     template: `
+    <app-header></app-header>
     <h2>Add New Car</h2>
     <div v-if="message[0] == 'good'">
         <div class="alert alert-success" role="alert">
@@ -812,6 +861,10 @@ const CarForm = {
                 console.log(jsonResponse);
                 if(jsonResponse.error){
                     self.message = ['bad', jsonResponse.error]
+                }
+                else if(jsonResponse.code){
+                  self.message = ['bad', ["Please Login"]]
+                  router.push('/login');
                 }
                 else{
                     self.message = ['good',["Car Sucessfully Added"]]

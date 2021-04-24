@@ -6,21 +6,53 @@ This file creates your application.
 """
 
 from app import app, db, login_manager
-from flask import render_template, request
+from flask import render_template, request, send_from_directory, jsonify, url_for
 
 import os
 from werkzeug.utils import secure_filename
-from .forms import UploadForm
 from .forms import CarForm, RegistrationForm, LoginForm, SearchForm
-from flask import send_from_directory, url_for
-from flask import jsonify
 
 from flask_login import login_user, logout_user, current_user, login_required
 from app.models import Users, Cars, Favourites
 from werkzeug.security import check_password_hash
 
 from datetime import date
+from functools import wraps
 import jwt
+
+# Create a JWT @requires_auth decorator
+# This decorator can be used to denote that a specific route should check
+# for a valid JWT token before displaying the contents of that route.
+def requires_auth(f):
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    auth = request.headers.get('Authorization', None) # or request.cookies.get('token', None)
+
+    if not auth:
+      return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
+
+    parts = auth.split()
+
+    if parts[0].lower() != 'bearer':
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
+    elif len(parts) == 1:
+      return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
+    elif len(parts) > 2:
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
+
+    token = parts[1]
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
+
+    #g.current_user = user = payload
+    return f(*args, **kwargs)
+
+  return decorated
 
 ###
 # Routing for your application.
@@ -70,6 +102,7 @@ def register():
 
 @app.route('/api/cars', methods=['POST', 'GET'])
 @login_required
+@requires_auth
 def cars():
     myform = CarForm()
     if request.method == 'POST': 
@@ -153,11 +186,12 @@ def cars():
 
 @app.route("/api/cars/<car_id>", methods=["GET"])
 @login_required
+@requires_auth
 def car(car_id):
     if request.method == 'GET':
         car = Cars.query.filter_by(id= car_id)
         car = {
-            "id": 1,
+            "id": 123,
             "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
             "year": "2014",
             "make": "Subaru",
@@ -174,22 +208,21 @@ def car(car_id):
     return jsonify(error= error)
 
 
-@app.route("/api/car/<car_id>/favourite", methods=["POST"])
+@app.route("/api/cars/<car_id>/favourite", methods=["POST"])
 @login_required
+@requires_auth
 def carFav(car_id):
     #myform = 
+    print(current_user.id)
     if request.method == 'POST': 
         info = {
                 "message": "Car Successfully Favourited",
-                "car_id": 1
+                "car_id": car_id
         }
         return  jsonify(info=info)
-    else:
-        info = {
-                "message": "Car Failed to be Favourited",
-                "car_id": 1
-        }
-        return  jsonify(info=info)
+    
+    info = {"message": "Car Failed to be Favourited" }
+    return  jsonify(info=info)
 
     #error = form_errors(myform)
     #return jsonify(error= error)
@@ -197,13 +230,14 @@ def carFav(car_id):
 
 @app.route("/api/search", methods=["GET"])
 @login_required
+@requires_auth
 def search():
     myform = SearchForm()
     if request.method == 'GET':
         smodel = request.args.get('model')
         smake = request.args.get('make')
         
-        results = Car.query.filter_by(model=smodel).filter_by(make=smake).all()
+        results = Cars.query.filter_by(model=smodel).filter_by(make=smake).all()
 
         results = [
             {
@@ -240,6 +274,7 @@ def search():
 
 @app.route("/api/users/<user_id>", methods=["GET"])
 @login_required
+@requires_auth
 def users(user_id):
     userq = Users.query.get(user_id)
     user = {
@@ -255,8 +290,9 @@ def users(user_id):
     return  jsonify(user=user)
 
 
-@app.route("/api/car/<user_id>/favourites", methods=["GET"])
+@app.route("/api/users/<user_id>/favourites", methods=["GET"])
 @login_required
+@requires_auth
 def userFav(user_id):
     results = [
         {
@@ -269,7 +305,7 @@ def userFav(user_id):
             "transmission": "Automatic",
             "car_type": "SUV",
             "price": 17998.99,
-            "photo": "http://localhost/images/subaru.jpg",
+            "photo": url_for('get_image', filename="" + "lqA9YvQUrI8.jpg"),
             "user_id": 1
         },
         {
@@ -282,7 +318,7 @@ def userFav(user_id):
             "transmission": "Manual",
             "car_type": "Sedan",
             "price": 32998.99,
-            "photo": "http://localhost/images/tesla.jpg",
+            "photo": url_for('get_image', filename="" + "2Z-qs3Fxvo4.jpg"),
             "user_id": 2
         }
     ]
@@ -336,10 +372,10 @@ def login():
 
 @app.route("/api/auth/logout")
 @login_required
+@requires_auth
 def logout():
     # Logout the user and end the session
     logout_user()
-    #flash('You have been logged out.', 'danger')
     info = {"message": "You were sucessfully logged out"}
     return  jsonify(info=info)
     #return redirect(url_for('index'))
@@ -386,7 +422,6 @@ def form_errors(form):
             error_messages.append(message)
 
     return error_messages
-
 
 ###
 # The functions below should be applicable to all Flask apps.
