@@ -36,16 +36,18 @@ app.component('app-header', {
           </li>
         </ul>
         
-        <ul class = "navbar-nav mr-auto">
+        <ul v-if="seen" class = "navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a @click="LogoutP" class="nav-link">Logout <span class="sr-only">(current)</span></a>
+            <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
+          </li>
+        </ul>
+        <ul v-else class = "navbar-nav mr-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/register">Register <span class="sr-only">(current)</span></router-link>
           </li>
-          <li class="nav-item active">
+          <li v-else class="nav-item active">
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
-          </li>
-          <li v-if="seen" class="nav-item active">
-            <a @click="LogoutP" class="nav-link">Logout <span class="sr-only">(current)</span></a>
-            <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
           </li>
         </ul>
       </div>
@@ -137,6 +139,7 @@ app.component('app-footer', {
 const Home = {
     name: 'Home',
     template: `
+    <app-header></app-header>
     <div class="row home-page" style="width:100%;">
       <div class="column home-des" style="float:left; width:50%; height:100%;">
         <div class="row">
@@ -185,6 +188,7 @@ const Home = {
 const RegistrationForm = {
     name: 'registration-form',
     template: `
+    <app-header></app-header>
     <h2>Register New User</h2>
     <div v-if="message[0] == 'good'">
         <div class="alert alert-success" role="alert">
@@ -288,6 +292,7 @@ const RegistrationForm = {
 const Login = {
     name: 'login',
     template: `
+    <app-header></app-header>
     <h2>Login to your account</h2>
     <div v-if="message[0] == 'good'">
         <div class="alert alert-success" role="alert">
@@ -375,7 +380,7 @@ const Login = {
 //------------------------------------------------------------
 const Logout = {
     name: 'logout',
-    template: `<h1></h1>`,
+    template: `<app-header></app-header>`,
     data() {
         return {
             message: []
@@ -414,6 +419,7 @@ const Logout = {
 const Explore = {
     name: 'explore',
     template: `
+    <app-header></app-header>
     <h2>Explore</h2>
     <form @submit.prevent="searchCar" id="searchForm" method="get">
     <div class="form-inline d-flex justify-content-center">
@@ -535,6 +541,7 @@ const Explore = {
 const CarDetails = {
   name: 'car-details',
   template: `
+  <app-header></app-header>
   <div class="card" id="card-details">
     <img v-bind:src = car.photo class="card-img-top" alt="cars Logo" id="card-img">
     
@@ -625,6 +632,7 @@ const CarDetails = {
 const User = {
   name: 'user',
   template:`
+    <app-header></app-header>
     <div class="card" id="myprofile">
 
       <div class="card-img"> 
@@ -736,6 +744,7 @@ const User = {
 const CarForm = {
     name: 'upload-form',
     template: `
+    <app-header></app-header>
     <h2>Add New Car</h2>
     <div v-if="message[0] == 'good'">
         <div class="alert alert-success" role="alert">
