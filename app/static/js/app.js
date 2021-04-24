@@ -531,38 +531,39 @@ const CarDetails = {
   name: 'car-details',
   template: `
   <div class="card" id="card-details">
-    <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
     
-    <div class="card-body">
-      <h5 class=card-title>{{car.year}} {{car.make}}</h5>
-      <h4 class=card-title>{{car.model}}</h4>
-      <p card-text>{{car.description}}</p>
+      <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
     
-      <div class="row">
-        <div class="col-md-4">
-          <p class="card-text">Colour: {{car.colour}}</p>
+      <div class="card-body">
+        <h5 class=card-title>{{car.year}} {{car.make}}</h5>
+        <h4 class=card-title>{{car.model}}</h4>
+        <p card-text>{{car.description}}</p>
+      
+        <div class="row">
+          <div class="col-md-4">
+            <p class="card-text">Colour: {{car.colour}}</p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="card-text">Body Type: {{car.car_type}}</p>
+          </div>
         </div>
 
-        <div class="col-md-4">
-          <p class="card-text">Body Type: {{car.car_type}}</p>
-        </div>
-      </div>
+        <div class="row">
+          <div class="col-md-4">
+            <p class="card-text">Price: {{car.price}}</p>
+          </div>
 
-      <div class="row">
-        <div class="col-md-4">
-          <p class="card-text">Price: {{car.price}}</p>
+          <div class="col-md-4">
+            <p class="card-text">Transmission: {{car.transmission}}</p>
+          </div>
         </div>
 
-        <div class="col-md-4">
-          <p class="card-text">Transmission: {{car.transmission}}</p>
+        <div class="row" id="prop-btn">
+            <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+            <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car_id)">Like</button>
+            <i class="bi bi-heart"></i>
         </div>
-      </div>
-
-      <div class="row" id="prop-btn">
-          <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
-          <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car_id)">Like</button>
-          <i class="bi bi-heart"></i>
-      </div>
     </div>
   </div>
   `,
@@ -585,21 +586,11 @@ const CarDetails = {
           .then(function (response) {
             return response.json();
       })
-          .then(function (jsonResponse) {
-            // display a success message
-            console.log(jsonResponse);
-            if(jsonResponse.error){
-              self.message = ['bad', jsonResponse.error]
-            }
-            else{
-              self.cars = jsonResponse.cars;
-            }      
-      })
-          .catch(function (error) {
-            console.log(error); 
-            });
+             .then(function(data){
+                console.log(data);
+                self.car = data.car;
+      });
     }
-
 
   },
   created() {
