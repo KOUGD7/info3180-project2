@@ -376,7 +376,6 @@ def login():
 def logout():
     # Logout the user and end the session
     logout_user()
-    #flash('You have been logged out.', 'danger')
     info = {"message": "You were sucessfully logged out"}
     return  jsonify(info=info)
     #return redirect(url_for('index'))

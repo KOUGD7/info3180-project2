@@ -15,7 +15,7 @@ app.component('app-header', {
 
       <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
             </li>
       </ul>
       
@@ -85,10 +85,11 @@ app.component('app-header', {
     LogoutP(){
       let self = this;
       //self.seen = false;
-      localStorage.auth = false;
+      //localStorage.auth = false;
       fetch('/api/auth/logout',{
         method: 'GET',
         headers: {
+          Authorization: "Bearer " + localStorage.token,
         // 'Authorization': 'Bearer <>'
         'X-CSRFToken': token
       },
@@ -101,10 +102,10 @@ app.component('app-header', {
         console.log(data);
         localStorage.removeItem('uid')
         localStorage.removeItem('token')
-        //localStorage.removeItem('auth')
+        localStorage.removeItem('auth')
         console.log(localStorage.auth)
 
-        router.push('/login');
+        router.push('/');
       }) 
       .catch(function (error) {
         console.log(error);
@@ -355,7 +356,7 @@ const Login = {
               let token = jsonResponse.info.token
               const tokenParts = token.split('.')
               const payload = JSON.parse(atob(tokenParts[1]))
-              console.log(payload)
+              //console.log(payload)
               //Store User Infomation in Local Storage
               localStorage.uid = payload.id
               localStorage.token = token
@@ -397,11 +398,9 @@ const Logout = {
         console.log(data);
         localStorage.removeItem('uid')
         localStorage.removeItem('token')
-
-        //localStorage.removeItem('auth')
+        localStorage.removeItem('auth')
         console.log(localStorage.auth)
-
-        router.push('/login');
+        router.push('/');
       }) 
       .catch(function (error) {
         console.log(error);
@@ -477,7 +476,13 @@ const Explore = {
       })
       .then(function(data) {
         console.log(data);
-        self.cars = data.cars;
+        if(data.code){
+          router.push('/login');
+        }
+        else{
+          self.cars = data.cars;
+        }
+        
       });
     },
     data() {
@@ -511,9 +516,7 @@ const Explore = {
             if(jsonResponse.error){
                 self.message = ['bad', jsonResponse.error]
             }
-            else{
-              self.cars = jsonResponse.cars;
-            }
+            self.cars = jsonResponse.cars;
             
             })
             .catch(function (error) {
@@ -692,6 +695,9 @@ const User = {
              })
              .then(function(data){
                 console.log(data);
+                if(data.code){
+                  router.push('/login');
+                }
                 self.user = data.user;
              });
 
@@ -833,6 +839,10 @@ const CarForm = {
                 console.log(jsonResponse);
                 if(jsonResponse.error){
                     self.message = ['bad', jsonResponse.error]
+                }
+                else if(jsonResponse.code){
+                  self.message = ['bad', ["Please Login"]]
+                  router.push('/login');
                 }
                 else{
                     self.message = ['good',["Car Sucessfully Added"]]
