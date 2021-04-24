@@ -426,7 +426,6 @@ def form_errors(form):
 
     return error_messages
 
-
 ###
 # The functions below should be applicable to all Flask apps.
 ###
