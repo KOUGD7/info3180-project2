@@ -290,7 +290,7 @@ def users(user_id):
     return  jsonify(user=user)
 
 
-@app.route("/api/car/<user_id>/favourites", methods=["GET"])
+@app.route("/api/users/<user_id>/favourites", methods=["GET"])
 @login_required
 @requires_auth
 def userFav(user_id):
@@ -305,7 +305,7 @@ def userFav(user_id):
             "transmission": "Automatic",
             "car_type": "SUV",
             "price": 17998.99,
-            "photo": "http://localhost/images/subaru.jpg",
+            "photo": url_for('get_image', filename="" + "lqA9YvQUrI8.jpg"),
             "user_id": 1
         },
         {
@@ -318,7 +318,7 @@ def userFav(user_id):
             "transmission": "Manual",
             "car_type": "Sedan",
             "price": 32998.99,
-            "photo": "http://localhost/images/tesla.jpg",
+            "photo": url_for('get_image', filename="" + "2Z-qs3Fxvo4.jpg"),
             "user_id": 2
         }
     ]

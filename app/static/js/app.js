@@ -652,19 +652,19 @@ const User = {
 
       <ul class="car-list d-flex flex-row flex-wrap">
 
-            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+            <div v-for="car in favourites" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
                 <div class="card-body">
 
                   <div class="card-title">
-                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>Random car title</h6>
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.year}} {{car.make}} {{car.model}}</h6>
                   </div>
 
                   <div class="card1">
-                    <img v-bind:src =car.urlToImage alt="car photo" class="card-img-top rounded-0"/>
+                    <img v-bind:src =car.photo alt="car photo" class="card-img-top rounded-0"/>
                   </div>
 
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
-                    <p class="card-text">Random car description</p>
+                    <p class="card-text">{{car.description}}</p>
                   </div>
                 </div>
             </div>
@@ -674,6 +674,7 @@ const User = {
     created()
     {
       let self = this;
+      let uid = localStorage.uid
 
       fetch(`/api/users/${self.$route.params.user_id}`, {
           method: 'GET',
@@ -690,34 +691,29 @@ const User = {
                 console.log(data);
                 self.user = data.user;
              });
+
+      fetch(`/api/users/${uid}/favourites`, {
+              method: 'GET',
+              headers: {
+                Authorization: "Bearer " + localStorage.token,
+                  'X-CSRFToken': token
+                  },
+                  credentials: 'same-origin'
+              })
+                 .then(function(response){
+                    return response.json();
+                 })
+                 .then(function(data){
+                    console.log(data);
+                    self.favourites = data.cars;
+                 });
     },
     data(){
       return{
         user: [],
-        /*  
-          searchTerm: '' */
+        favourites: []
+  
       }
-    },
-    methods: {
-     /* searchcar(){
-        let self = this;
-
-        fetch('/api/cars'+ self.searchTerm + '&language=en',{
-          method: 'GET',
-          body: form_data,
-          headers: {
-              'X-CSRFToken': token
-              },
-              credentials: 'same-origin'
-          })
-              .then(function(response){
-                return response.json();
-              })
-              .then(function(data){
-                console.log(data);
-                self.cars = data.cars;
-              });
-      } */
     }
 };
 
