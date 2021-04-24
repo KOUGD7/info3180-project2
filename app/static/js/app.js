@@ -249,7 +249,6 @@ const RegistrationForm = {
             let self = this;
             let uploadprofile = document.getElementById('uploadprofile');
             let form_data = new FormData(uploadprofile);
-            console.log(form_data);
   
             fetch("/api/register", {
                 method: 'POST',
@@ -563,6 +562,7 @@ const CarDetails = {
 
       <div class="row" id="prop-btn">
           <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+          <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car.id)">Like</button>
           <i class="bi bi-heart"></i>
       </div>
     </div>
@@ -575,7 +575,26 @@ const CarDetails = {
       }
   },
   methods: {
-
+    addToFavourites(car_id){
+      let self = this;
+      let host = window.location.protocol + "//" + window.location.host;
+      //fetch(`api/cars/${car_id}/favourite`,{
+      fetch(`${host}/api/cars/${car_id}/favourite`,{
+        method: 'POST',
+        headers: {
+          Authorization: "Bearer " + localStorage.token,
+          'X-CSRFToken': token
+          },
+          credentials: 'same-origin'
+      })
+          .then(function (response) {
+            return response.json();
+      })
+             .then(function(data){
+                console.log(data);
+                //self.car = data.car;
+      });
+    }
   },
   created() {
     let self = this;

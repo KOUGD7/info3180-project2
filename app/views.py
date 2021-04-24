@@ -191,7 +191,7 @@ def car(car_id):
     if request.method == 'GET':
         car = Cars.query.filter_by(id= car_id)
         car = {
-            "id": 1,
+            "id": 123,
             "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
             "year": "2014",
             "make": "Subaru",
@@ -208,23 +208,21 @@ def car(car_id):
     return jsonify(error= error)
 
 
-@app.route("/api/car/<car_id>/favourite", methods=["POST"])
+@app.route("/api/cars/<car_id>/favourite", methods=["POST"])
 @login_required
 @requires_auth
 def carFav(car_id):
     #myform = 
+    print(current_user.id)
     if request.method == 'POST': 
         info = {
                 "message": "Car Successfully Favourited",
-                "car_id": 1
+                "car_id": car_id
         }
         return  jsonify(info=info)
-    else:
-        info = {
-                "message": "Car Failed to be Favourited",
-                "car_id": 1
-        }
-        return  jsonify(info=info)
+    
+    info = {"message": "Car Failed to be Favourited" }
+    return  jsonify(info=info)
 
     #error = form_errors(myform)
     #return jsonify(error= error)
