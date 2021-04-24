@@ -12,7 +12,7 @@ import os
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
 from .forms import CarForm, RegistrationForm, LoginForm, SearchForm
-from flask import send_from_directory
+from flask import send_from_directory, url_for
 from flask import jsonify
 
 from flask_login import login_user, logout_user, current_user, login_required
@@ -25,28 +25,6 @@ import jwt
 ###
 # Routing for your application.
 ###
-
-@app.route('/api/upload', methods=['POST'])
-def upload():
-    myform = UploadForm()
-    if request.method == 'POST':
-        if myform.validate_on_submit():
-            # Get file data and save to your uploads folder
-            description = myform.description.data
-            photo = myform.photo.data
-
-            filefolder = app.config['UPLOAD_FOLDER']
-            filename = secure_filename(photo.filename)
-
-            #rootdir = os.getcwd()
-            photo.save(os.path.join(filefolder,filename))
-
-            info = {'message': 'File Upload Successful', 'filename': filename, 'description': description}
-            return  jsonify(info=info)
-            
-        error = form_errors(myform)
-        return jsonify(error= error)
-
 
 @app.route("/api/register", methods=["POST"])
 def register():
@@ -91,6 +69,7 @@ def register():
 
 
 @app.route('/api/cars', methods=['POST', 'GET'])
+@login_required
 def cars():
     myform = CarForm()
     if request.method == 'POST': 
@@ -104,22 +83,40 @@ def cars():
             Type = myform.Car_Type.data
             Tran = myform.Transmission.data
             Descrip = myform.Description.data
+            uid = myform.User.data
             photo = myform.photo.data
 
             filefolder = app.config['UPLOAD_FOLDER']
             filename = secure_filename(photo.filename)
 
+            #descrip, make, model, col, year, tran, type1, price, url, uid
+            car = Cars (Descrip, Make, Model, Colour, Year, Tran, Type, Price, filename, uid)
+            db.session.add(car)
+            #db.session.commit()
+
             #rootdir = os.getcwd()
             photo.save(os.path.join(filefolder,filename))
 
-            car = {'message': 'Car Successful Added', 'Make': Make, 'Model': Model, 'Colour': Colour, 'Year': Year, 'Price': Price, 'Type': Type, 'Transmission': Tran, 'Description': Descrip }
-            info = {'message': 'File Upload Successful', 'filename': filename, 'description': Descrip}
+            car = {
+                'description': car.description,
+                'year': car.year, 
+                'make': car.make, 
+                'model': car.model, 
+                'colour': car.colour,
+                'transmission': car.transmission,
+                'type': car.price,
+                'price': car.price, 
+                'photo': url_for('get_image', filename="" + car.photo),
+                'user_id': car.user_id
+            }
             return  jsonify(car=car)
 
         error = form_errors(myform)
         return jsonify(error= error)
 
     if request.method == 'GET':
+        cars = db.session.query(Cars).all()
+
         cars = [
             {
                 "id": 1,
@@ -131,7 +128,7 @@ def cars():
                 "transmission": "Automatic",
                 "car_type": "SUV",
                 "price": 17998.99,
-                "photo": "http://localhost/images/subaru.jpg",
+                "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
                 "user_id": 1
             },
             {
@@ -144,7 +141,7 @@ def cars():
                 "transmission": "Automatic",
                 "car_type": "Sedan",
                 "price": 32998.99,
-                "photo": "http://localhost/images/tesla.jpg",
+                "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
                 "user_id": 2
             }
         ]
@@ -155,9 +152,10 @@ def cars():
 
 
 @app.route("/api/cars/<car_id>", methods=["GET"])
+@login_required
 def car(car_id):
-    #myform =
     if request.method == 'GET':
+        car = Cars.query.filter_by(id= car_id)
         car = {
             "id": 1,
             "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
@@ -168,7 +166,7 @@ def car(car_id):
             "transmission": "Automatic",
             "car_type": "SUV",
             "price": 17998.99,
-            "photo": "http://localhost/images/subaru.jpg",
+            "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
             "user_id": 1
         }
         return  jsonify(car=car)
@@ -177,6 +175,7 @@ def car(car_id):
 
 
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])
+@login_required
 def carFav(car_id):
     #myform = 
     if request.method == 'POST': 
@@ -197,12 +196,15 @@ def carFav(car_id):
 
 
 @app.route("/api/search", methods=["GET"])
+@login_required
 def search():
     myform = SearchForm()
     if request.method == 'GET':
-        print(request.args.get('model'))
-        print(request.args.get('make'))
-        print(request)
+        smodel = request.args.get('model')
+        smake = request.args.get('make')
+        
+        results = Car.query.filter_by(model=smodel).filter_by(make=smake).all()
+
         results = [
             {
             "id": 123,
@@ -214,7 +216,7 @@ def search():
             "transmission": "Automatic",
             "car_type": "SUV",
             "price": 17998.99,
-            "photo": "http://localhost/images/subaru.jpg",
+            "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
             "user_id": 1
             },
             {
@@ -227,7 +229,7 @@ def search():
             "transmission": "Automatic",
             "car_type": "Truck",
             "price": 32998.99,
-            "photo": "http://localhost/images/tesla.jpg",
+            "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
             "user_id": 2
             }
         ]
@@ -237,21 +239,24 @@ def search():
 
 
 @app.route("/api/users/<user_id>", methods=["GET"])
+@login_required
 def users(user_id):
+    userq = Users.query.get(user_id)
     user = {
-        "id": 1,
-        "username": "car_expert",
-        "name": "Danica Patrick",
-        "photo": "http://localhost/images/photo.jpg",
-        "email": "dpatrick@example.com",
-        "location": "Wisconsin, USA",
-        "biography": "I am a former professional racing driver and the most successful woman in the history of American open-wheel racing. I love cars and driving fast.",
-        "date_joined": "2021-04-05 17:53:00"
+        "id": userq.id,
+        "username": userq.username,
+        "name": userq.name,
+        "photo": url_for('get_image', filename="" + userq.photo),
+        "email": userq.email,
+        "location": userq.location,
+        "biography": userq.biography,
+        "date_joined": userq.date_joined
     }
     return  jsonify(user=user)
 
 
 @app.route("/api/car/<user_id>/favourites", methods=["GET"])
+@login_required
 def userFav(user_id):
     results = [
         {
@@ -286,14 +291,14 @@ def userFav(user_id):
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    form = LoginForm()
+    myform = LoginForm()
     if request.method == "POST":
         # change this to actually validate the entire form submission
         # and not just one field
         #if form.username.data:
-        if form.validate_on_submit():
-            usern = form.username.data
-            passw = form.password.data
+        if myform.validate_on_submit():
+            usern = myform.Username.data
+            passw = myform.Password.data
 
             user = Users.query.filter_by(username= usern)
 
@@ -312,18 +317,20 @@ def login():
                 secret = app.config['SECRET_KEY']
                 payload = {'id': user.id, 'name': user.name}
                 encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
-
+                
                 info = {
                     "message": "Login Successful",
-                    "token": encoded_jwt
+                    "token": encoded_jwt.decode('UTF-8')
                  }
 
                 # remember to flash a message to the user
                 #flash('Logged in successfully.', 'success')
                 #return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
                 return  jsonify(info=info)
+            info = {"message": "Invalid Username/ Password"}
+            return  jsonify(info=info)
     #return render_template("login.html", form=form)
-    error = form_errors(form)
+    error = form_errors(myform)
     return jsonify(error= error)
 
 
@@ -332,8 +339,15 @@ def login():
 def logout():
     # Logout the user and end the session
     logout_user()
-    flash('You have been logged out.', 'danger')
-    return redirect(url_for('index'))
+    #flash('You have been logged out.', 'danger')
+    info = {"message": "You were sucessfully logged out"}
+    return  jsonify(info=info)
+    #return redirect(url_for('index'))
+
+@app.route('/images/<filename>')
+def get_image(filename):
+    rootdir = os.getcwd()
+    return send_from_directory(os.path.join(rootdir, app.config['UPLOAD_FOLDER']), filename)
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session

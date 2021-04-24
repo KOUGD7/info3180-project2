@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField
-from wtforms import SelectField
-from wtforms import PasswordField 
+from wtforms import StringField, SelectField, PasswordField, HiddenField
 from wtforms.fields.html5 import EmailField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, InputRequired
@@ -17,9 +15,10 @@ class UploadForm (FlaskForm):
     ])
 
 
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired()])
-    password = PasswordField('Password', validators=[InputRequired()])
+class LoginForm (FlaskForm):
+    Username = StringField('Username', validators=[DataRequired()])
+    Password = PasswordField('Password', validators=[DataRequired()])
+
 
 class RegistrationForm (FlaskForm):
     Username = StringField('Username', validators=[DataRequired()])
@@ -41,6 +40,7 @@ class CarForm (FlaskForm):
     Colour = StringField('Colour', validators=[DataRequired()])
     Year = StringField('Year', validators=[DataRequired()])
     Price = StringField('Price', validators=[DataRequired()])
+    User = HiddenField('User', validators=[DataRequired()])
     
     choices1 = [('SUV', 'SUV'), ('Sedan', 'Sedan'), ('Hatch', 'Hatch'), ('Truck','Truck')]
     Car_Type = SelectField("Car Type", choices = choices1, default = ['SUV'])
