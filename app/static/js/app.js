@@ -653,20 +653,20 @@ const User = {
 
       <ul class="car-list d-flex flex-row flex-wrap">
 
-            <div class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+            <div v-for="result in results" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
                 <div class="card-body">
 
                   <div class="card1">
-                    <img v-bind:src =car.urlToImage alt="car photo" class="card-img-top rounded-0"/>
+                    <img v-bind:src =result.photo alt="car photo" class="card-img-top rounded-0"/>
                   </div>
 
                   <div class="row card-title">
-                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.year}}{{car.make}}</h6>
-                    <div>{{car.price}}</div>
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{result.year}}{{result.make}}</h6>
+                    <div>{{results.price}}</div>
                   </div>
 
                   <div class="row card-title">
-                    <p class="card-title m1-2 mb-0 pb-0">{{car.model}}</p>
+                    <p class="card-title m1-2 mb-0 pb-0">{{results.model}}</p>
                   </div>
 
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
