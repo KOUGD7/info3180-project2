@@ -46,7 +46,7 @@ app.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/register">Register <span class="sr-only">(current)</span></router-link>
           </li>
-          <li v-else class="nav-item active">
+          <li class="nav-item active">
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
           </li>
         </ul>
