@@ -17,7 +17,42 @@ from app.models import Users, Cars, Favourites
 from werkzeug.security import check_password_hash
 
 from datetime import date
+from functools import wraps
 import jwt
+
+# Create a JWT @requires_auth decorator
+# This decorator can be used to denote that a specific route should check
+# for a valid JWT token before displaying the contents of that route.
+def requires_auth(f):
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    auth = request.headers.get('Authorization', None) # or request.cookies.get('token', None)
+
+    if not auth:
+      return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
+
+    parts = auth.split()
+
+    if parts[0].lower() != 'bearer':
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
+    elif len(parts) == 1:
+      return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
+    elif len(parts) > 2:
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
+
+    token = parts[1]
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
+
+    #g.current_user = user = payload
+    return f(*args, **kwargs)
+
+  return decorated
 
 ###
 # Routing for your application.
@@ -67,6 +102,7 @@ def register():
 
 @app.route('/api/cars', methods=['POST', 'GET'])
 @login_required
+@requires_auth
 def cars():
     myform = CarForm()
     if request.method == 'POST': 
@@ -150,6 +186,7 @@ def cars():
 
 @app.route("/api/cars/<car_id>", methods=["GET"])
 @login_required
+@requires_auth
 def car(car_id):
     if request.method == 'GET':
         car = Cars.query.filter_by(id= car_id)
@@ -173,6 +210,7 @@ def car(car_id):
 
 @app.route("/api/car/<car_id>/favourite", methods=["POST"])
 @login_required
+@requires_auth
 def carFav(car_id):
     #myform = 
     if request.method == 'POST': 
@@ -194,13 +232,14 @@ def carFav(car_id):
 
 @app.route("/api/search", methods=["GET"])
 @login_required
+@requires_auth
 def search():
     myform = SearchForm()
     if request.method == 'GET':
         smodel = request.args.get('model')
         smake = request.args.get('make')
         
-        results = Car.query.filter_by(model=smodel).filter_by(make=smake).all()
+        results = Cars.query.filter_by(model=smodel).filter_by(make=smake).all()
 
         results = [
             {
@@ -237,6 +276,7 @@ def search():
 
 @app.route("/api/users/<user_id>", methods=["GET"])
 @login_required
+@requires_auth
 def users(user_id):
     userq = Users.query.get(user_id)
     user = {
@@ -254,6 +294,7 @@ def users(user_id):
 
 @app.route("/api/car/<user_id>/favourites", methods=["GET"])
 @login_required
+@requires_auth
 def userFav(user_id):
     results = [
         {
@@ -333,6 +374,7 @@ def login():
 
 @app.route("/api/auth/logout")
 @login_required
+@requires_auth
 def logout():
     # Logout the user and end the session
     logout_user()

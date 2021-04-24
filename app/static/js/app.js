@@ -11,28 +11,28 @@ const app = Vue.createApp({
 app.component('app-header', {
     name: 'AppHeader',
     template: `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand" href="#">United Auto Sales</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
+      <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+            <router-link v-if="seen" class="nav-link" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
+            </li>
+      </ul>
+      
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
     
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul v-if="seen" class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <a v-if="seen" class="nav-link" @click="myProfile">MyProfile <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <router-link v-if="seen" class="nav-link" to="/cars/{card_id}">Car Details <span class="sr-only">(current)</span></router-link>
+            <a class="nav-link" @click="myProfile">My Profile<span class="sr-only">(current)</span></a>
           </li>
         </ul>
         
@@ -43,12 +43,12 @@ app.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
           </li>
-        <li class="nav-item active">
-          <a @click="LogoutP" v-if="seen" class="nav-link">Logout <span class="sr-only">(current)</span></a>
-          <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
-        </li>
+          <li v-if="seen" class="nav-item active">
+            <a @click="LogoutP" class="nav-link">Logout <span class="sr-only">(current)</span></a>
+            <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
+          </li>
         </ul>
-        </div>
+      </div>
     </nav>
     `,
     created(){
@@ -385,6 +385,7 @@ const Logout = {
       fetch('/api/auth/logout',{
         method: 'GET',
         headers: {
+        Authorization: "Bearer " + localStorage.token,
         // 'Authorization': 'Bearer <>'
         'X-CSRFToken': token
       },
@@ -466,7 +467,8 @@ const Explore = {
       fetch('/api/cars',{
         method: 'GET',
         headers: {
-        // 'Authorization': 'Bearer <>'
+        // JWT requires the Authorization schema to be `Bearer` instead of `Basic`
+        Authorization: "Bearer " + localStorage.token,
         'X-CSRFToken': token
       },
       credentials: 'same-origin'
@@ -496,6 +498,7 @@ const Explore = {
         fetch(`/api/search?model=${model}&make=${make}`, {
             method: 'GET',
             headers: {
+              Authorization: "Bearer " + localStorage.token,
                 'X-CSRFToken': token
                 },
                 credentials: 'same-origin'
@@ -579,6 +582,7 @@ const CarDetails = {
     fetch(`/api/cars/${self.$route.params.car_id}`,{
       method: 'GET',
       headers: {
+      Authorization: "Bearer " + localStorage.token,
       // 'Authorization': 'Bearer <>'
       'X-CSRFToken': token
     },
@@ -655,6 +659,7 @@ const User = {
       fetch(`/api/users/${self.$route.params.user_id}`, {
           method: 'GET',
           headers: {
+            Authorization: "Bearer " + localStorage.token,
               'X-CSRFToken': token
               },
               credentials: 'same-origin'
