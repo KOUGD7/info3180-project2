@@ -42,7 +42,7 @@ class CarForm (FlaskForm):
     Price = StringField('Price', validators=[DataRequired()])
     User = HiddenField('User', validators=[DataRequired()])
     
-    choices1 = [('SUV', 'SUV'), ('Sedan', 'Sedan'), ('Hatch', 'Hatch'), ('Truck','Truck')]
+    choices1 = [('SUV', 'SUV'), ('Sedan', 'Sedan'), ('Hatchback', 'Hatchback'), ('Truck','Truck')]
     Car_Type = SelectField("Car Type", choices = choices1, default = ['SUV'])
 
     choices2 = [('Automatic', 'Automatic'), ('Manual', 'Manual')]
