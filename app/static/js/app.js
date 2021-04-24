@@ -453,6 +453,7 @@ const CarDetails = {
 
       <div class="row" id="prop-btn">
           <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+          <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car_id)">Like</button>
           <i class="bi bi-heart"></i>
       </div>
     </div>
@@ -465,12 +466,35 @@ const CarDetails = {
       }
   },
   methods: {
+    addToFavourites(){
+    let self = this;
+    fetch(`api/cars/{car_id}/favourite/${self.$route.params.car_id}`,{
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': token
+        },
+        credentials: 'same-origin'
+      })
+        .then(function (response) {
+          return response.json();
+      })
+        .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+          if(jsonResponse.error){
+              self.message = ['bad', jsonResponse.error]
+          }      
+      })
+        .catch(function (error) {
+          console.log(error);
+      });
 
+    }
   },
   created() {
     let self = this;
     fetch(`/api/cars/${self.$route.params.car_id}`,{
-      method: 'GET',
+      method: 'GET', 
       headers: {
       // 'Authorization': 'Bearer <>'
       'X-CSRFToken': token
