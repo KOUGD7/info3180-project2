@@ -531,7 +531,7 @@ const CarDetails = {
   name: 'car-details',
   template: `
   <div class="card" id="card-details">
-    <img src="/static/home-img.jpg" class="card-img-top" alt="cars Logo" id="card-img">
+    <img v-bind:src = car.photo class="card-img-top" alt="cars Logo" id="card-img">
     
     <div class="card-body">
       <h5 class=card-title>{{car.year}} {{car.make}}</h5>
