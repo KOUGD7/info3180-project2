@@ -575,8 +575,8 @@ const CarDetails = {
   methods: {
     addToFavourites(){
     let self = this;
-    fetch(`api/cars/{car_id}/favourite/${self.$route.params.car_id}`,{
-      method: 'POST',
+    fetch(`api/users/{user_id}/favourites/${self.$route.params.car_id}`,{
+      method: 'GET',
       headers: {
         'X-CSRFToken': token
         },
@@ -653,19 +653,24 @@ const User = {
 
       <ul class="car-list d-flex flex-row flex-wrap">
 
-            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+            <div class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
                 <div class="card-body">
-
-                  <div class="card-title">
-                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>Random car title</h6>
-                  </div>
 
                   <div class="card1">
                     <img v-bind:src =car.urlToImage alt="car photo" class="card-img-top rounded-0"/>
                   </div>
 
+                  <div class="row card-title">
+                    <h6 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.year}}{{car.make}}</h6>
+                    <div>{{car.price}}</div>
+                  </div>
+
+                  <div class="row card-title">
+                    <p class="card-title m1-2 mb-0 pb-0">{{car.model}}</p>
+                  </div>
+
                   <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
-                    <p class="card-text">Random car description</p>
+                    <button class="btn btn-primary mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
                   </div>
                 </div>
             </div>
@@ -699,26 +704,10 @@ const User = {
       }
     },
     methods: {
-     /* searchcar(){
-        let self = this;
-
-        fetch('/api/cars'+ self.searchTerm + '&language=en',{
-          method: 'GET',
-          body: form_data,
-          headers: {
-              'X-CSRFToken': token
-              },
-              credentials: 'same-origin'
-          })
-              .then(function(response){
-                return response.json();
-              })
-              .then(function(data){
-                console.log(data);
-                self.cars = data.cars;
-              });
-      } */
+      goToCarDetails(cid){
+        this.$router.push(`/cars/${cid}`);
     }
+  }
 };
 
 //--------------------------------------------------------------
