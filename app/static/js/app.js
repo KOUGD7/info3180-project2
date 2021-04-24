@@ -574,29 +574,33 @@ const CarDetails = {
   },
   methods: {
     addToFavourites(){
-    let self = this;
-    fetch(`api/users/{user_id}/favourites/${self.$route.params.car_id}`,{
-      method: 'GET',
-      headers: {
-        'X-CSRFToken': token
-        },
-        credentials: 'same-origin'
+      let self = this;
+      fetch(`api/users/{user_id}/favourites/${self.$route.params.car_id}`,{
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': token
+          },
+          credentials: 'same-origin'
       })
-        .then(function (response) {
-          return response.json();
+          .then(function (response) {
+            return response.json();
       })
-        .then(function (jsonResponse) {
-          // display a success message
-          console.log(jsonResponse);
-          if(jsonResponse.error){
+          .then(function (jsonResponse) {
+            // display a success message
+            console.log(jsonResponse);
+            if(jsonResponse.error){
               self.message = ['bad', jsonResponse.error]
-          }      
+            }
+            else{
+              self.cars = jsonResponse.cars;
+            }      
       })
-        .catch(function (error) {
-          console.log(error);
-      });
-
+          .catch(function (error) {
+            console.log(error); 
+            });
     }
+
+
   },
   created() {
     let self = this;
