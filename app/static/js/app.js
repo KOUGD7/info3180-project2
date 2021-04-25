@@ -12,45 +12,40 @@ app.component('app-header', {
     name: 'AppHeader',
     template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <router-link class="nav-link text-white mr-5" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-            <router-link class="nav-link" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
-            </li>
+    <div class="collapse navbar-collapse ml-5 float-right" id="navbarSupportedContent">    
+      <ul v-if="seen" class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <router-link class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
+        </li>
+        <li class="nav-item active">
+          <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" @click="myProfile">My Profile<span class="sr-only">(current)</span></a>
+        </li>
       </ul>
-      
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul v-if="seen" class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/explore">Explore <span class="sr-only">(current)</span></router-link>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" @click="myProfile">My Profile<span class="sr-only">(current)</span></a>
-          </li>
-        </ul>
         
-        <ul v-if="seen" class = "navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a @click="LogoutP" class="nav-link">Logout <span class="sr-only">(current)</span></a>
-            <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
-          </li>
-        </ul>
-        <ul v-else class = "navbar-nav mr-auto">
+          
+      <ul class = "navbar-nav">
+        <li v-if="seen" class="nav-item active">
+          <a @click="LogoutP" class="nav-link">Logout <span class="sr-only">(current)</span></a>
+          <!-- <router-link @click="LogoutP" v-if="seen" class="nav-link" to="/logout">Logout <span class="sr-only">(current)</span></router-link> -->
+        </li>
+        <div v-else class = "navbar-nav mr-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/register">Register <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" to="/login">Login <span class="sr-only">(current)</span></router-link>
           </li>
-        </ul>
-      </div>
+        </div>
+      </ul>
+    </div>
     </nav>
     `,
     created(){
@@ -169,8 +164,8 @@ const Home = {
           </div>
       </div>
 
-      <div class="column" style="float:left; width:50%; padding--right:50px; height:100%;">
-         <img class="img-fluid" src="/static/home-img.jpg" alt="home-img" style="height:100%;">
+      <div class="column" style="float:left; width:50%; padding--right:50px;">
+         <img class="img-fluid" src="/images/home.jpg" alt="home-img">
        </div>
 
       </div>
@@ -453,7 +448,7 @@ const Explore = {
         <input type="search" name="model" id="model" class="form-control m-2"/>
           
         <div>
-          <button class="btn btn-primary btn-md m2-2" style="padding:6px 20px 6px 20px;">Search</button>
+          <button class="btn btn-md m2-2 text-white" style="padding:6px 20px 6px 20px; background-color:#04AA6D;">Search</button>
         </div>
         
       </form>
@@ -463,35 +458,27 @@ const Explore = {
     <br>
 
     <div class="car-list d-flex flex-row">
-
       <ul class="car-list d-flex flex-row flex-wrap">
 
-            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+        <div v-for="car in cars" class="card m-2" style="width:21rem;">
+          <img v-bind:src=car.photo alt="car photo" class="card-img-top rounded-top" style="width:100%;"/>
+          <div class="card-body mb-1">
+            <div class="mb-2 d-flex flex-row flex-wrap justify-content-between">
+              <div class="mr-0 mb-1">
+                <h4 class="mb-0 font-weight-bold">{{car.year}} {{car.make}}</h4>
+                <p class="my-1">{{car.model}}</p>
+              </div>
 
-                  <div class="card1">
-                    <img v-bind:src = car.photo alt="car photo" class="card-img-top rounded-top" style="width:100%;"/>
-                  </div>
-
-                  <div class="card-body">
-                    <div class="card-title row ">
-                      <div class="col">
-                        <h4 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.make}}</h4>
-                      </div>
-
-                      <div class="col" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF;">
-                          <img src="/static/iconfinder_tag_430120.png" style="padding:5px;">{{car.price}}
-                      </div>
-                    </div>
-
-                    <div class="card-title">
-                      <p>{{car.model}}</p>
-                    </div>
-
-                    <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
-                      <button class="btn btn-primary btn-block mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
-                    </div>
-                </div>
+              <div class="h-25 p-1 m-1" style="background-color:#04AA6D; border-radius:10px; color:#FFFFFF;">
+                <img class="pr-1" src="/images/iconfinder_tag.png" style="">{{car.price}}
+              </div>
             </div>
+             
+            <div class="card-text mb-1 mt d-flex flex-row flex-wrap">
+              <button class="btn btn-primary btn-block mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
+            </div>
+          </div>
+        </div>
       </ul>
     </div>   
     
@@ -701,20 +688,27 @@ const User = {
           <div class="col-12 mt-3">
             <div class="card"  style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
               <div class="card-horizontal"> 
-                <div class="card-img" style="width:30%;"> 
+                <div class="card-img" style="width:40%;"> 
                   <img v-bind:src = user.photo class="card-img-top" alt="profilephoto" id="profilephoto" style="border-radius:50%;padding:20px;">
                 </div>  
 
-                <div class="card-body" style="text-align:left; width:100%;">
-                  <h1 class="card-title font-weight-bold">{{user.name}}</h1>
-                  <h4 class="card-title">@{{user.username}}</h4>
+                <div class="card-body text-left w-75 p-5">
+                  <h2 class="card-title font-weight-bold">{{user.name}}</h2>
+                  <h4 class="card-title text-muted">@{{user.username}}</h4>
+                  <p class="card-text text-muted">{{user.biography}}</p>
                   <br>
-                  <p class="card-text">{{user.biography}}</p>
-                  <br>
-                  <br>
-                  <p class="card-text text-left">Email: {{user.email}}</p>
-                  <p class="card-text text-left">Location: {{user.location}}</p>
-                  <p class="card-text text-left">Joined: {{user.date_joined}}</p> 
+                  <div class="mb-1 d-flex flex-row flex-wrap">
+                    <p class="card-text text-left">Email:  &nbsp &nbsp &nbsp &nbsp  &nbsp</p>
+                    <p class="card-text text-left font-weight-bold">{{user.email}}</p>
+                  </div>
+                  <div class="mb-1 d-flex flex-row flex-wrap">
+                    <p class="card-text text-left">Location:   &nbsp &nbsp</p>
+                    <p class="font-weight-bold">{{user.location}}</p>
+                  </div>
+                  <div class="mb-1 d-flex flex-row flex-wrap">
+                    <p class="card-text text-left">Joined:  &nbsp &nbsp &nbsp  &nbsp</p>
+                    <p class="font-weight-bold">{{user.date_joined}}</p>
+                  </div> 
                 </div>   
               </div> 
             </div>
@@ -724,40 +718,31 @@ const User = {
     <br>
 
     <div>
-      <h2 class="text-left" style="text-align:left; padding: 10px 70px 10px 60px;">Cars Favourited</h2>
+      <h2 class="text-left font-weight-bold" style="padding: 10px 70px 10px 60px;">Cars Favourited</h2>
     </div>
 
     <div class="car-list d-flex flex-row">
-
       <ul class="car-list d-flex flex-row flex-wrap">
-          <div v-for="car in favourites" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
 
-            <div class="card1" style="text-align:left;">
-              <img v-bind:src = car.photo alt="car photo" class="card-img-top rounded-top" style="width:100%;"/>
-            </div>
-
-            <div class="card-body">
-              <div class="card-title row ">
-                <div class="col">
-                  <h4 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.make}}</h4>
-                </div>
-
-                <div class="col" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF;">
-                  <img src="/static/iconfinder_tag_430120.png" style="padding:5px;">{{car.price}}
-                </div>
+        <div v-for="car in favourites" class="card m-2" style="width:21rem;">
+          <img v-bind:src=car.photo alt="car photo" class="card-img-top rounded-top" style="width:100%;"/>
+          <div class="card-body mb-1">
+            <div class="mb-2 d-flex flex-row flex-wrap justify-content-between">
+              <div class="mr-0 mb-1">
+                <h4 class="mb-0 font-weight-bold">{{car.year}} {{car.make}}</h4>
+                <p class="my-1">{{car.model}}</p>
               </div>
 
-              <div class="card-title">
-                      <p>{{car.model}}</p>
-              </div>
-
-              <div class="card-text mb-3 mt d-flex flex-row flex-wrap">
-                <button class="btn btn-primary btn-block mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
+              <div class="h-25 p-1 m-1" style="background-color:#04AA6D; border-radius:10px; color:#FFFFFF;">
+                <img class="pr-1" src="/images/iconfinder_tag.png" style="">{{car.price}}
               </div>
             </div>
-
+             
+            <div class="card-text mb-1 mt d-flex flex-row flex-wrap">
+              <button class="btn btn-primary btn-block mb-2" @click="goToCarDetails(car.id)">ViewDetails</button>
+            </div>
           </div>
-
+        </div>
       </ul>
     </div>
   `,
