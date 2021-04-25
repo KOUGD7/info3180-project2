@@ -34,3 +34,20 @@ body {
 .details .col{
 	padding: 0px 25px 0px 10px;
 }
+
+#like-btn{
+	border-radius: 50%;
+	background-color: #FFFFFF;
+	border: 2px solid #ebebe0;
+}
+
+#heart::before{
+	color:#ff0066;
+}
+#heart::after{
+	color:#ff0066;
+}
+
+#price-tag{
+	color: #FFFFFF;
+}

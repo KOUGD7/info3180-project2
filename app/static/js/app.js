@@ -288,9 +288,11 @@ const RegistrationForm = {
                 console.log(jsonResponse);
                 if(jsonResponse.error){
                     self.message = ['bad', jsonResponse.error]
+                    uploadprofile.reset();
                 }
                 else{
-                    //self.message = ['good',[jsonResponse]]
+                    self.message = ['good',["User Sucessfully Added"]]
+                    uploadprofile.reset();
                 }
                 
                 })
@@ -376,6 +378,7 @@ const Login = {
             console.log(jsonResponse);
             if(jsonResponse.error){
               self.message = ['bad', jsonResponse.error]
+              loginF.reset();
               }
             else{
               self.message = ['good',[jsonResponse.info.message]]
@@ -478,8 +481,11 @@ const Explore = {
                         <h4 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.make}}</h4>
                       </div>
 
-                      <div class="col" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF;">
-                          <img src="/static/iconfinder_tag_430120.png" style="padding:5px;">{{car.price}}
+                      <div class="col">
+                        <div class="row" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF; display:flex">
+                            <div class="col"><i class="fa fa-tag fa-lg" id="price-tag"></div>
+                            <div class="col">{{car.price}}</div>
+                        </div>
                       </div>
                     </div>
 
@@ -579,7 +585,7 @@ const CarDetails = {
           <div class="card-horizontal">
 
             <div class="img-square-wrapper">
-              <img v-bind:src = car.photo class="card-img-top" alt="cars Logo" id="card-img">
+              <img v-bind:src = car.photo class="card-img-top" alt="cars Logo" id="card-img" style="height:100%;">
             </div>
 
             <div class="card-body details">
@@ -614,27 +620,21 @@ const CarDetails = {
               </div>       
 
               <br>
-              <br>
-              <br>
-
               <div class="row" id="prop-btn">
                 <div class="row">
                   <div class="col">
-                    <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
+                    <button type="submit" name="submit" class="btn btn-primary mr-5 px-4">EmailOwner</button>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="col">
-                   <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car.id)">Like</button>
+                   <button type="submit" name="submit" class="btn btn-primary ml-5" @click="addToFavourites(car.id)" id="like-btn">
+                    <i class="fa fa-heart-o fa-lg" id="heart"></i>
+                  </button>
                   </div>
                 </div>
-                  <i class="bi bi-heart"></i>
-              </div>
-
-              </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -742,8 +742,11 @@ const User = {
                   <h4 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.make}}</h4>
                 </div>
 
-                <div class="col" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF;">
-                  <img src="/static/iconfinder_tag_430120.png" style="padding:5px;">{{car.price}}
+                <div class="col">
+                  <div class="row" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF; display:flex">
+                      <div class="col"><i class="fa fa-tag fa-lg" id="price-tag"></div>
+                      <div class="col">{{car.price}}</div>
+                  </div>
                 </div>
               </div>
 
@@ -933,6 +936,7 @@ const CarForm = {
                 console.log(jsonResponse);
                 if(jsonResponse.error){
                     self.message = ['bad', jsonResponse.error]
+                    uploadCar.reset();
                 }
                 else if(jsonResponse.code){
                   self.message = ['bad', ["Please Login"]]
@@ -940,6 +944,7 @@ const CarForm = {
                 }
                 else{
                     self.message = ['good',["Car Sucessfully Added"]]
+                    uploadCar.reset();
                 }
                 
                 })
