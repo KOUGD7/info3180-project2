@@ -469,7 +469,7 @@ const Explore = {
 
       <ul class="car-list d-flex flex-row flex-wrap">
 
-            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:18rem;">
+            <div v-for="car in cars" class="card mr-4 mt-4 mb-4 ml-4" style="width:19rem;">
 
                   <div class="card1">
                     <img v-bind:src = car.photo alt="car photo" class="card-img-top rounded-top" style="width:100%;"/>
@@ -742,11 +742,8 @@ const User = {
                   <h4 class="card-title m1-2 mb-0 pb-0" font-weight-bold mb-2>{{car.make}}</h4>
                 </div>
 
-                <div class="col">
-                  <div class="row" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF; display:flex">
-                      <div class="col"><i class="fa fa-tag fa-lg" id="price-tag"></div>
-                      <div class="col">{{car.price}}</div>
-                  </div>
+                <div class="col" style="background-color:#04AA6D; padding:6px; border-radius:10px; color:#FFFFFF;">
+                  <img src="/static/iconfinder_tag_430120.png" style="padding:5px;">{{car.price}}
                 </div>
               </div>
 
