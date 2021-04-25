@@ -253,7 +253,7 @@ def search():
         smodel = "%{}%".format(smodel)
         smake = "%{}%".format(smake)
         
-        results = Cars.query.filter(Cars.model.like(smodel), Cars.make.like(smake)).all()
+        results = Cars.query.filter(Cars.model.ilike(smodel), Cars.make.ilike(smake)).all()
         cars = []
         for c in results:
             car = {
