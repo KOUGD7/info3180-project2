@@ -920,6 +920,7 @@ const CarForm = {
                 method: 'POST',
                 body: form_data,
                 headers: {
+                    Authorization: "Bearer " + localStorage.token,
                     'X-CSRFToken': token
                     },
                     credentials: 'same-origin'

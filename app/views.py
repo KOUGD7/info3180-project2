@@ -77,11 +77,9 @@ def register():
 
         #username, password, name, email, loca, bio, url, date
         user = Users (username, password, name, email, loc, bio, filename, date_joined)
-        #print(user)
         db.session.add(user)
         db.session.commit()
 
-        #rootdir = os.getcwd()
         photo.save(os.path.join(filefolder,filename))
 
         info = {
@@ -94,6 +92,7 @@ def register():
             "biography": user.biography,
             "date_joined": user.date_joined
             }
+
         return  jsonify(info=info)
 
     error = form_errors(myform)
@@ -125,7 +124,7 @@ def cars():
             #descrip, make, model, col, year, tran, type1, price, url, uid
             car = Cars (Descrip, Make, Model, Colour, Year, Tran, Type, Price, filename, uid)
             db.session.add(car)
-            #db.session.commit()
+            db.session.commit()
 
             #rootdir = os.getcwd()
             photo.save(os.path.join(filefolder,filename))
@@ -142,15 +141,31 @@ def cars():
                 'photo': url_for('get_image', filename="" + car.photo),
                 'user_id': car.user_id
             }
-            return  jsonify(car=car)
 
+            return  jsonify(car=car)
         error = form_errors(myform)
         return jsonify(error= error)
 
     if request.method == 'GET':
-        cars = db.session.query(Cars).all()
-
-        cars = [
+        carsResult = db.session.query(Cars).all()
+        cars = []
+        for c in carsResult:
+            car = {
+                "id": c.id,
+                "description": c.description,
+                "year": c.year,
+                "make": c.make,
+                "model": c.model,
+                "colour": c.colour,
+                "transmission": c.transmission,
+                "car_type": c.car_type,
+                "price": c.price,
+                "photo": url_for('get_image', filename="" + c.photo),
+                "user_id": current_user.id
+            }
+            cars.append(car)
+        
+        """ cars = [
             {
                 "id": 1,
                 "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
@@ -177,7 +192,7 @@ def cars():
                 "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
                 "user_id": 2
             }
-        ]
+        ] """
 
         return  jsonify(cars=cars)
     error = form_errors(myform)
@@ -189,20 +204,21 @@ def cars():
 @requires_auth
 def car(car_id):
     if request.method == 'GET':
-        car = Cars.query.filter_by(id= car_id)
+        c = Cars.query.get(car_id)
         car = {
-            "id": 123,
-            "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive",
-            "year": "2014",
-            "make": "Subaru",
-            "model": "Forrester",
-            "colour": "Gray",
-            "transmission": "Automatic",
-            "car_type": "SUV",
-            "price": 17998.99,
-            "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
-            "user_id": 1
+            "id": c.id,
+            "description": c.description,
+            "year": c.year,
+            "make": c.make,
+            "model": c.model,
+            "colour": c.colour,
+            "transmission": c.transmission,
+            "car_type": c.car_type,
+            "price": c.price,
+            "photo": url_for('get_image', filename="" + c.photo),
+            "user_id": c.user_id
         }
+
         return  jsonify(car=car)
     error = form_errors(myform)
     return jsonify(error= error)
@@ -212,20 +228,17 @@ def car(car_id):
 @login_required
 @requires_auth
 def carFav(car_id):
-    #myform = 
-    print(current_user.id)
-    if request.method == 'POST': 
+    if request.method == 'POST':
+        fav = Favourites(car_id, current_user.id)
+        db.session.add(fav)
+        db.session.commit()
         info = {
-                "message": "Car Successfully Favourited",
-                "car_id": car_id
+            "message": "Car Successfully Favourited",
+            "car_id": fav.car_id
         }
         return  jsonify(info=info)
-    
     info = {"message": "Car Failed to be Favourited" }
     return  jsonify(info=info)
-
-    #error = form_errors(myform)
-    #return jsonify(error= error)
 
 
 @app.route("/api/search", methods=["GET"])
@@ -236,38 +249,29 @@ def search():
     if request.method == 'GET':
         smodel = request.args.get('model')
         smake = request.args.get('make')
-        
-        results = Cars.query.filter_by(model=smodel).filter_by(make=smake).all()
 
-        results = [
-            {
-            "id": 123,
-            "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
-            "year": "2014",
-            "make": "Toyota",
-            "model": "Corolla",
-            "colour": "Gray",
-            "transmission": "Automatic",
-            "car_type": "SUV",
-            "price": 17998.99,
-            "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
-            "user_id": 1
-            },
-            {
-            "id": 207,
-            "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
-            "year": "2018",
-            "make": "Ford",
-            "model": "F1 50",
-            "colour": "Red",
-            "transmission": "Automatic",
-            "car_type": "Truck",
-            "price": 32998.99,
-            "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
-            "user_id": 2
+        smodel = "%{}%".format(smodel)
+        smake = "%{}%".format(smake)
+        
+        results = Cars.query.filter(Cars.model.ilike(smodel), Cars.make.ilike(smake)).all()
+        cars = []
+        for c in results:
+            car = {
+                "id": c.id,
+                "description": c.description,
+                "year": c.year,
+                "make": c.make,
+                "model": c.model,
+                "colour": c.colour,
+                "transmission": c.transmission,
+                "car_type": c.car_type,
+                "price": c.price,
+                "photo": url_for('get_image', filename="" + c.photo),
+                "user_id": c.user_id
             }
-        ]
-        return  jsonify(cars=results)
+            cars.append(car)
+
+        return  jsonify(cars=cars)
     error = form_errors(myform)
     return jsonify(error= error)
 
@@ -276,7 +280,7 @@ def search():
 @login_required
 @requires_auth
 def users(user_id):
-    userq = Users.query.get(user_id)
+    userq = Users.query.get(int(user_id))
     user = {
         "id": userq.id,
         "username": userq.username,
@@ -294,35 +298,27 @@ def users(user_id):
 @login_required
 @requires_auth
 def userFav(user_id):
-    results = [
-        {
-            "id": 123,
-            "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
-            "year": "2034",
-            "make": "Fiji",
-            "model": "Frester",
-            "colour": "Gray",
-            "transmission": "Automatic",
-            "car_type": "SUV",
-            "price": 17998.99,
-            "photo": url_for('get_image', filename="" + "lqA9YvQUrI8.jpg"),
-            "user_id": 1
-        },
-        {
-            "id": 207,
-            "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
-            "year": "2083",
-            "make": "Rwarter",
-            "model": "Slaid",
-            "colour": "Red",
-            "transmission": "Manual",
-            "car_type": "Sedan",
-            "price": 32998.99,
-            "photo": url_for('get_image', filename="" + "2Z-qs3Fxvo4.jpg"),
-            "user_id": 2
+    results = Favourites.query.filter_by(user_id = user_id).all()
+    cars = []
+    for r in results:
+        
+        c = Cars.query.get(r.car_id)
+        car = {
+            "id": c.id,
+            "description": c.description,
+            "year": c.year,
+            "make": c.make,
+            "model": c.model,
+            "colour": c.colour,
+            "transmission": c.transmission,
+            "car_type": c.car_type,
+            "price": c.price,
+            "photo": url_for('get_image', filename="" + c.photo),
+            "user_id": c.user_id
         }
-    ]
-    return  jsonify(cars=results)
+        cars.append(car)
+
+    return  jsonify(cars=cars)
 
 
 @app.route("/api/auth/login", methods=["POST"])
@@ -384,6 +380,7 @@ def logout():
 def get_image(filename):
     rootdir = os.getcwd()
     return send_from_directory(os.path.join(rootdir, app.config['UPLOAD_FOLDER']), filename)
+
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
