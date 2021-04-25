@@ -72,6 +72,15 @@ def register():
         photo = myform.photo.data
         date_joined = date.today()
 
+        num = Users.query.filter_by(username = username).all()
+        l = len(num)
+        if l > 0:
+            info = {
+            "message": "Username already taken: " +username
+            }
+            return  jsonify(error=info)
+
+
         filefolder = app.config['UPLOAD_FOLDER']
         filename = secure_filename(photo.filename)
 
@@ -229,6 +238,14 @@ def car(car_id):
 @requires_auth
 def carFav(car_id):
     if request.method == 'POST':
+        num = Favourites.query.filter_by(car_id = car_id).filter_by(user_id = current_user.id).all()
+        l = len(num)
+        if l > 0:
+            info = {
+            "message": "Car Already Favourited",
+            "car_id": car_id
+            }
+            return  jsonify(info=info)
         fav = Favourites(car_id, current_user.id)
         db.session.add(fav)
         db.session.commit()
@@ -360,7 +377,7 @@ def login():
                 #return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
                 return  jsonify(info=info)
             info = {"message": "Invalid Username/ Password"}
-            return  jsonify(info=info)
+            return  jsonify(error=info)
     #return render_template("login.html", form=form)
     error = form_errors(myform)
     return jsonify(error= error)
@@ -380,6 +397,11 @@ def logout():
 def get_image(filename):
     rootdir = os.getcwd()
     return send_from_directory(os.path.join(rootdir, app.config['UPLOAD_FOLDER']), filename)
+
+@app.route('/icon/<filename>')
+def get_icon(filename):
+    rootdir = os.getcwd()
+    return send_from_directory(os.path.join(rootdir, app.config['ICON_FOLDER']), filename)
 
 
 # user_loader callback. This callback is used to reload the user object from

@@ -3,6 +3,14 @@ body {
     margin: 0;
 }
 
+#prop-btn{
+	margin-top: 80px;
+}
+
+#like-img{
+	border-radius: 0px;
+}
+
 .img-fluid{
 	height:auto;
 	max-width:100%;

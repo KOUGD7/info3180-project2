@@ -57,21 +57,7 @@ app.component('app-header', {
       return {
         user: [],
         seen: localStorage.auth,
-      }
-      /**if("auth" in localStorage){
-        console.log(localStorage.auth)
-        return {
-          user: [],
-          seen: true,
-        }
-      }
-      else{
-        console.log(localStorage.auth)
-        return {
-          user: [],
-          seen: false,
-        }
-      }**/
+      }   
   },
   methods: {
     myProfile(){
@@ -87,7 +73,6 @@ app.component('app-header', {
         method: 'GET',
         headers: {
           Authorization: "Bearer " + localStorage.token,
-        // 'Authorization': 'Bearer <>'
         'X-CSRFToken': token
       },
       credentials: 'same-origin'
@@ -107,8 +92,6 @@ app.component('app-header', {
       .catch(function (error) {
         console.log(error);
       });
-      
-      //self.seen = false
     }
     
   }
@@ -151,7 +134,6 @@ const Home = {
               </p>
             </div>
           
-
             <div class="row">
               <div class="col-md-2 mr-auto">
                 <button @click="goToRegister()" type="submit" class="register btn btn-primary btn-lg" style="background-color:#1E90FF; color:#FFFFFF; border:none;">Register</button>
@@ -164,8 +146,8 @@ const Home = {
           </div>
       </div>
 
-      <div class="column" style="float:left; width:50%; padding--right:50px;">
-         <img class="img-fluid" src="/images/home.jpg" alt="home-img">
+      <div class="column" style="float:left; width:50%; padding-right:50px;">
+         <img class="img-fluid" src="/icon/home.jpg" alt="home-img">
        </div>
 
       </div>
@@ -470,7 +452,7 @@ const Explore = {
               </div>
 
               <div class="h-25 p-1 m-1" style="background-color:#04AA6D; border-radius:10px; color:#FFFFFF;">
-                <img class="pr-1" src="/images/iconfinder_tag.png" style="">{{car.price}}
+                <img class="pr-1" src="/icon/iconfinder_tag.png" style="">{{car.price}}
               </div>
             </div>
              
@@ -559,70 +541,51 @@ const CarDetails = {
   name: 'car-details',
   template: `
   <app-header></app-header>
-  <div class ="container-fluid">
-    <div class="row">
-      <div class="col-12 mt-4">
-        <div class="card">
-          <div class="card-horizontal">
+  <div class="container-fluid mb-5">
+    <div class="card mb-5 w-100" style="flex-direction: row;">
+      <img v-bind:src = car.photo class="card-img w-50" alt="Cars Logo">
+      <div class="card-body">
+        <h1 class="card-title font-weight-bold mb-1">{{car.year}} {{car.make}}</h1>
+        <h4 class="card-title text-muted mt-1 mb-4">{{car.model}}</h4>
+        
+        <p class="card-text text-muted">{{car.description}}</p>
+        <br>
 
-            <div class="img-square-wrapper">
-              <img v-bind:src = car.photo class="card-img-top" alt="cars Logo" id="card-img">
-            </div>
-
-            <div class="card-body details">
-              <h1 class="card-title font-weight-bold">{{car.year}} {{car.make}}</h1>
-              <h4 class="card-title">{{car.model}}</h4>
-              <br>
-              <p class="card-text">{{car.description}}</p>
-              <br>
-              <div class="row">              
-                  <div class="row">
-                    <p class="card-text col">Colour</p>
-                    <h6 class="card-text font-weight-bold col">{{car.colour}}</h6>
-                  </div>
-               
-              
-                  <div class="row">
-                    <p class="card-text col">Body Type</p>
-                    <h6 class="card-text font-weight-bold col">{{car.car_type}}</h6>
-                  </div>             
-              </div>
-
-              <div class="row">             
-                  <div class="row">
-                    <p class="card-text col">Price</p>
-                    <h6 class="card-text font-weight-bold col">{{car.price}}</h6>
-                  </div>
-                
-                  <div class="row">
-                    <p class="card-text col">Transmission</p>
-                    <h6 class="card-text font-weight-bold col">{{car.transmission}}</h6>
-                  </div>             
-              </div>       
-
-              <br>
-              <br>
-              <br>
-
-              <div class="row" id="prop-btn">
-                <div class="row">
-                  <div class="col">
-                    <button type="submit" name="submit" class="btn btn-primary">EmailOwner</button>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col">
-                   <button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car.id)">Like</button>
-                  </div>
-                </div>
-                  <i class="bi bi-heart"></i>
-              </div>
-
-              </div>
-            </div>
-
+        <div class="row">
+          <div class="col d-flex flex-row flex-wrap">            
+            <p class="card-text">Colour: &nbsp</p>
+            <p class="card-text font-weight-bold">{{car.colour}}</p>
           </div>
+          <div class="col d-flex flex-row flex-wrap">
+            <p class="card-text">Body Type: &nbsp &nbsp &nbsp</p>
+            <p class="card-text font-weight-bold">{{car.car_type}}</p> 
+          </div>            
+          <div class="w-100"></div>
+          <div class="col d-flex flex-row flex-wrap">
+            <p class="card-text">Price: &nbsp &nbsp</p>
+            <p class="card-text font-weight-bold">{{car.price}}</p>
+          </div>
+          <div class="col d-flex flex-row flex-wrap">
+            <p class="card-text">Transmission: &nbsp </p>
+            <p class="card-text font-weight-bold">{{car.transmission}}</p>
+          </div>
+        </div>             
+        
+        <br>
+        <br>
+        
+
+        <div class="mx-3" id="prop-btn">
+          <div class="row">
+            <button type="submit" name="submit" class="col btn text-white" style="background-color:#04AA6D;">Email Owner</button>
+            <a @click="addToFavourites(car.id)" class="col clickable" >
+              <img id="like-img" alt="Like" class="m-2 float-right" style="width: 15%;" src="/icon/like.png">
+            </a>
+          </div>
+          
+          <!--<button type="submit" name="submit" class="btn btn-primary" @click="addToFavourites(car.id)">Like</button>-->
+          
+
         </div>
       </div>
     </div>
@@ -734,7 +697,7 @@ const User = {
               </div>
 
               <div class="h-25 p-1 m-1" style="background-color:#04AA6D; border-radius:10px; color:#FFFFFF;">
-                <img class="pr-1" src="/images/iconfinder_tag.png" style="">{{car.price}}
+                <img class="pr-1" src="/icon/iconfinder_tag.png" style="">{{car.price}}
               </div>
             </div>
              
