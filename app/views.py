@@ -72,6 +72,10 @@ def register():
         photo = myform.photo.data
         date_joined = date.today()
 
+        if not checkLen(bio):
+            info = {"message": "Max Bio: 255 characters"}
+            return  jsonify(error=info)
+
         num = Users.query.filter_by(username = username).all()
         l = len(num)
         if l > 0:
@@ -113,7 +117,7 @@ def register():
 @requires_auth
 def cars():
     myform = CarForm()
-    if request.method == 'POST': 
+    if request.method == 'POST':
         if myform.validate_on_submit():
             # Get file data and save to your uploads folder
             Make = myform.Make.data
@@ -127,6 +131,15 @@ def cars():
             uid = myform.User.data
             photo = myform.photo.data
 
+            #validate Price and Description
+            if not checkPrice(Price):
+                info = {"message": "Invalid Price"}
+                return  jsonify(error=info)
+
+            if not checkLen(Descrip):
+                info = {"message": "Max Description: 255 characters"}
+                return  jsonify(error=info)
+            
             filefolder = app.config['UPLOAD_FOLDER']
             filename = secure_filename(photo.filename)
 
@@ -174,35 +187,6 @@ def cars():
             }
             cars.append(car)
         
-        """ cars = [
-            {
-                "id": 1,
-                "description": "4-cyl, Gas, 2.5L, 4WD/AWD, All Wheel Drive, Automatic Transmission",
-                "year": "2014",
-                "make": "Subaru",
-                "model": "Forrester",
-                "colour": "Gray",
-                "transmission": "Automatic",
-                "car_type": "SUV",
-                "price": 17998.99,
-                "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
-                "user_id": 1
-            },
-            {
-                "id": 2,
-                "description": "The best electic car anyone can buy. With the longest range and quickest acceleration of any electric vehicle in production, Model S Plaid is the highest performing sedan ever built",
-                "year": "2018",
-                "make": "Tesla",
-                "model": "Model S Plaid",
-                "colour": "Red",
-                "transmission": "Automatic",
-                "car_type": "Sedan",
-                "price": 32998.99,
-                "photo": url_for('get_image', filename="" + '2Z-qs3Fxvo4.jpg'),
-                "user_id": 2
-            }
-        ] """
-
         return  jsonify(cars=cars)
     error = form_errors(myform)
     return jsonify(error= error)
@@ -389,7 +373,7 @@ def login():
 def logout():
     # Logout the user and end the session
     logout_user()
-    info = {"message": "You were sucessfully logged out"}
+    info = [{"message": "You were sucessfully logged out"}]
     return  jsonify(info=info)
     #return redirect(url_for('index'))
 
@@ -403,6 +387,21 @@ def get_icon(filename):
     rootdir = os.getcwd()
     return send_from_directory(os.path.join(rootdir, app.config['ICON_FOLDER']), filename)
 
+def checkPrice(P):
+    P = P.replace(',', '')
+    status = True
+    try:
+        float(P)
+        status = True
+    except:
+        status = False
+    return status
+
+def checkLen(s):
+    if len(s)>255:
+        return False
+    else:
+        return True
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session

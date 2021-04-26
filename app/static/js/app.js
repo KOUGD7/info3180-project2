@@ -11,13 +11,17 @@ const app = Vue.createApp({
 app.component('app-header', {
     name: 'AppHeader',
     template: `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <nav id="navbar1" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <router-link class="nav-link text-white mr-5" to="/">United Auto Sales<span class="sr-only">(current)</span></router-link>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse ml-5 float-right" id="navbarSupportedContent">    
+      
+      <ul  class="navbar-nav mr-auto">
+      </ul>
+    
       <ul v-if="seen" class="navbar-nav mr-auto">
         <li class="nav-item active">
           <router-link class="nav-link" to="/cars/new">Add Car<span class="sr-only">(current)</span></router-link>
@@ -29,7 +33,8 @@ app.component('app-header', {
           <a class="nav-link" @click="myProfile">My Profile<span class="sr-only">(current)</span></a>
         </li>
       </ul>
-        
+      <ul  class="navbar-nav mr-auto">
+      </ul>
           
       <ul class = "navbar-nav">
         <li v-if="seen" class="nav-item active">
@@ -67,12 +72,14 @@ app.component('app-header', {
     },
     LogoutP(){
       let self = this;
+      var n = document.getElementById('navbar1');
+      var content
       //self.seen = false;
       //localStorage.auth = false;
       fetch('/api/auth/logout',{
         method: 'GET',
         headers: {
-          Authorization: "Bearer " + localStorage.token,
+        Authorization: "Bearer " + localStorage.token,
         'X-CSRFToken': token
       },
       credentials: 'same-origin'
@@ -85,9 +92,11 @@ app.component('app-header', {
         localStorage.removeItem('uid')
         localStorage.removeItem('token')
         localStorage.removeItem('auth')
-        console.log(localStorage.auth)
-
-        router.push('/');
+        console.log(localStorage)
+        //refresh nav
+        content = n.innerHTML
+        n.innerHTML= content
+        router.push('/login');
       }) 
       .catch(function (error) {
         console.log(error);
@@ -146,7 +155,7 @@ const Home = {
           </div>
       </div>
 
-      <div class="column" style="float:left; width:50%; padding-right:50px;">
+      <div class="column" style="float:left; width:50%;">
          <img class="img-fluid" src="/icon/home.jpg" alt="home-img">
        </div>
 
@@ -332,6 +341,7 @@ const Login = {
         let self = this;
         let loginF = document.getElementById('loginForm');
         let form_data = new FormData(loginF);
+        var n = document.getElementById('navbar1');
         /* let p = document.getElementById('username').value;
         let l = document.getElementById('password').value;
         console.log(form_data)
@@ -364,6 +374,9 @@ const Login = {
               localStorage.uid = payload.id
               localStorage.token = token
               localStorage.auth = true
+              //refresh nav
+              content = n.innerHTML;
+              n.innerHTML= content;
               router.push('/explore');
               }
               })
