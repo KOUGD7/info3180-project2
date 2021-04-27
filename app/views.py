@@ -73,7 +73,7 @@ def register():
         date_joined = date.today()
 
         if not checkLen(bio):
-            info = {"message": "Max Bio: 255 characters"}
+            info = {"message": "Max Bio: 500 characters"}
             return  jsonify(error=info)
 
         num = Users.query.filter_by(username = username).all()
@@ -137,7 +137,7 @@ def cars():
                 return  jsonify(error=info)
 
             if not checkLen(Descrip):
-                info = {"message": "Max Description: 255 characters"}
+                info = {"message": "Max Description: 500 characters"}
                 return  jsonify(error=info)
             
             filefolder = app.config['UPLOAD_FOLDER']
