@@ -15,7 +15,7 @@ class Users(db.Model):
     name = db.Column(db.String(255))
     email = db.Column(db.String(255))
     location = db.Column(db.String(255))
-    biography = db.Column(db.String(255))
+    biography = db.Column(db.String(500))
     photo = db.Column(db.String(255))
     date_joined = db.Column(db.Date)
     
@@ -58,7 +58,7 @@ class Cars(db.Model):
     __tablename__ = 'cars'
 
     id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(255))
+    description = db.Column(db.String(500))
     make = db.Column(db.String(80))
     model = db.Column(db.String(80))
     colour = db.Column(db.String(80))

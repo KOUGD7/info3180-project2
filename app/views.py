@@ -398,7 +398,7 @@ def checkPrice(P):
     return status
 
 def checkLen(s):
-    if len(s)>255:
+    if len(s)>=500:
         return False
     else:
         return True
