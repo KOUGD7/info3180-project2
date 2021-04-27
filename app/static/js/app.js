@@ -205,37 +205,37 @@ const RegistrationForm = {
           <div class="row">
             <div class= "col">
               <label>Username</label>
-              <input type="text" class ="form-control" name="Username">
+              <input type="text" class ="form-control" name="Username" placeholder="username">
             </div>
       
             <div class= "col">
               <label>Password</label>
-              <input type="password" class ="form-control" name="Password">
+              <input type="password" class ="form-control" name="Password" placeholder="password">
             </div>
           </div>
 
           <div class="row">
             <div class= "col">
               <label>Full name</label>
-              <input type="text" class ="form-control" name="Name">
+              <input type="text" class ="form-control" name="Name" placeholder="name">
             </div>
       
             <div class= "col">
               <label>Email</label>
-              <input type="email" class ="form-control" name="Email">
+              <input type="email" class ="form-control" name="Email" placeholder="email">
             </div>
           </div>
 
           <div class="row">
             <div class= "col">
               <label>Location</label>
-              <input type="text" class ="form-control" name="Location">
+              <input type="text" class ="form-control" name="Location" placeholder="location">
             </div>
           </div>
     
           <div class="form-group">
             <label>Biography</label>
-            <textarea class="form-control" rows="5" id="des" name="Biography"></textarea>
+            <textarea class="form-control" rows="5" id="des" name="Biography" placeholder="biography"></textarea>
           </div>
       
           <div class = "form-group">
@@ -802,24 +802,24 @@ const CarForm = {
         <div class="row">
           <div class= "col">
             <label>Make</label>
-            <input type="text" class ="form-control" name="Make">
+            <input type="text" class ="form-control" name="Make" placeholder="make">
           </div>
     
           <div class= "col">
             <label>Model</label>
-            <input type="text" class ="form-control" name="Model">
+            <input type="text" class ="form-control" name="Model"  placeholder="model">
           </div>
         </div>
 
         <div class="row">
           <div class= "col">
             <label>Colour</label>
-            <input type="text" class ="form-control" name="Colour">
+            <input type="text" class ="form-control" name="Colour"  placeholder="colour">
           </div>
     
           <div class= "col">
             <label>Year</label>
-            <input type="text" class ="form-control" name="Year">
+            <input type="text" class ="form-control" name="Year"  placeholder="year">
           </div>
         </div>
 
@@ -828,12 +828,12 @@ const CarForm = {
         <div class="row">
           <div class= "col">
             <label>Price</label>
-            <input type="text" class ="form-control" name="Price">
+            <input type="text" class ="form-control" name="Price"  placeholder="price">
           </div>
     
           <div class= "col">
             <label>Car Type</label>
-            <select id="Car_Type" name="Car_Type" class ="form-control">
+            <select id="Car_Type" name="Car_Type" class ="form-control"  placeholder="Select Car Type">
               <option value="SUV">SUV</option>
               <option value="Sedan">Sedan</option>
               <option value="Hatchback">Hatchback</option>
@@ -845,7 +845,7 @@ const CarForm = {
         <div class="row">
           <div class= "col">
             <label>Transmission</label>
-            <select id="Transmission" name="Transmission" class ="form-control">
+            <select id="Transmission" name="Transmission" class ="form-control"  placeholder="transmission">
               <option value="Automatic">Automatic</option>
               <option value="Manual">Manual</option>
             </select>
@@ -854,7 +854,7 @@ const CarForm = {
 
         <div class= "form-group">
           <label>Description</label>
-          <textarea class ="form-control" name="Description" placeholder="Description"></textarea>
+          <textarea class ="form-control" name="Description" placeholder="Description"  placeholder="description"></textarea>
         </div>
   
         <div class = "form-group">
